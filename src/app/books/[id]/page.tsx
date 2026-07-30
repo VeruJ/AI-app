@@ -44,6 +44,35 @@ export default async function BookPage({
         </div>
       )}
 
+      {(book.startedAt || book.finishedAt || book.pagesRead || book.totalPages) && (
+        <section className="mt-6">
+          <h2 className="mb-2 text-lg font-semibold">Reading progress</h2>
+          {(book.startedAt || book.finishedAt) && (
+            <p className="text-gray-700">
+              {book.startedAt ? `Started ${book.startedAt}` : 'Start date not set'}
+              {book.finishedAt ? ` · Finished ${book.finishedAt}` : ''}
+            </p>
+          )}
+          {(book.pagesRead || book.totalPages) && (
+            <div className="mt-2">
+              <p className="text-sm text-gray-500">
+                {book.pagesRead ?? 0} / {book.totalPages ?? '?'} pages
+              </p>
+              {book.totalPages ? (
+                <div className="mt-1 h-2 w-full rounded bg-gray-100">
+                  <div
+                    className="h-2 rounded bg-indigo-600"
+                    style={{
+                      width: `${Math.min(100, ((book.pagesRead ?? 0) / book.totalPages) * 100)}%`,
+                    }}
+                  />
+                </div>
+              ) : null}
+            </div>
+          )}
+        </section>
+      )}
+
       {book.thoughts && (
         <section className="mt-6">
           <h2 className="mb-2 text-lg font-semibold">My thoughts</h2>

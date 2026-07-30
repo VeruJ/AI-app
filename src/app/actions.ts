@@ -14,6 +14,13 @@ function parseForm(formData: FormData): BookInput {
     .map((q) => q.trim())
     .filter(Boolean)
 
+  const startedAt = String(formData.get('startedAt') ?? '') || undefined
+  const finishedAt = String(formData.get('finishedAt') ?? '') || undefined
+  const pagesReadRaw = formData.get('pagesRead')
+  const totalPagesRaw = formData.get('totalPages')
+  const pagesRead = pagesReadRaw ? Number(pagesReadRaw) : undefined
+  const totalPages = totalPagesRaw ? Number(totalPagesRaw) : undefined
+
   return {
     title: String(formData.get('title') ?? ''),
     author: String(formData.get('author') ?? ''),
@@ -22,6 +29,10 @@ function parseForm(formData: FormData): BookInput {
     thoughts: String(formData.get('thoughts') ?? ''),
     quotes,
     yearRead: Number(formData.get('yearRead') ?? new Date().getFullYear()),
+    startedAt,
+    finishedAt,
+    pagesRead,
+    totalPages,
   }
 }
 
