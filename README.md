@@ -1,3 +1,19 @@
+# Between the Lines
+
+A personal reading journal to log the books I read and capture what I thought
+of them — rating, quotes and reflections, grouped by the year I read them.
+
+## Stack
+Next.js + TypeScript + Tailwind, data in `data/app.json`
+
+## Local development
+```bash
+npm install
+npm run dev
+```
+
+---
+
 # App Vibe Kit — evisions
 
 A ready-made kit of skills for the **Vibe Coding: from idea to app** workshop.
