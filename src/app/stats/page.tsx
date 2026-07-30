@@ -71,10 +71,12 @@ export default async function StatsPage() {
               <div className="space-y-4">
                 {years.map((year) => {
                   const yearBooks = byYear.get(year)!
+                  const totalPages = yearBooks.reduce((sum, b) => sum + (b.totalPages ?? 0), 0)
                   return (
                     <div key={year}>
                       <p className="mb-2 text-sm font-medium text-gray-600">
                         {year} · {yearBooks.length} book{yearBooks.length === 1 ? '' : 's'}
+                        {totalPages > 0 ? ` · ${totalPages.toLocaleString()} pages` : ''}
                       </p>
                       <div className="flex flex-wrap gap-2">
                         {yearBooks.map((book) => (
