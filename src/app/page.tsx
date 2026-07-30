@@ -1,17 +1,28 @@
 import Link from 'next/link'
-import { listBooks, STATUS_LABELS } from '@/lib/data'
-import StarRating from '@/components/StarRating'
+import { listBooks } from '@/lib/data'
+import BookListItem from '@/components/BookListItem'
 
 export const dynamic = 'force-dynamic'
 
 const UNSCHEDULED = 'unscheduled' as const
 
+function tabHref(params: { q: string; genre: string; minRating: string }, tab: string) {
+  const query = new URLSearchParams()
+  if (params.q) query.set('q', params.q)
+  if (params.genre) query.set('genre', params.genre)
+  if (params.minRating) query.set('minRating', params.minRating)
+  query.set('tab', tab)
+  return `/?${query.toString()}`
+}
+
 export default async function HomePage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; genre?: string; minRating?: string; status?: string }>
+  searchParams: Promise<{ q?: string; genre?: string; minRating?: string; tab?: string }>
 }) {
-  const { q = '', genre = '', minRating = '', status = '' } = await searchParams
+  const { q = '', genre = '', minRating = '', tab = 'library' } = await searchParams
+  const isTbrTab = tab === 'tbr'
+  const params = { q, genre, minRating }
   const books = await listBooks()
 
   const allGenres = [...new Set(books.flatMap((b) => b.genres))].sort()
@@ -24,12 +35,16 @@ export default async function HomePage({
       book.author.toLowerCase().includes(query)
     const matchesGenre = !genre || book.genres.includes(genre)
     const matchesRating = !minRating || book.rating >= Number(minRating)
-    const matchesStatus = !status || book.status === status
-    return matchesQuery && matchesGenre && matchesRating && matchesStatus
+    return matchesQuery && matchesGenre && matchesRating
   })
 
-  const byYear = new Map<number | typeof UNSCHEDULED, typeof filtered>()
-  for (const book of filtered) {
+  const toBeRead = filtered.filter((b) => b.status === 'tbr' && !b.finishedAt)
+  const libraryBooks = filtered.filter((b) => !(b.status === 'tbr' && !b.finishedAt))
+  const currentReads = libraryBooks.filter((b) => b.status === 'reading' && !b.finishedAt)
+  const rest = libraryBooks.filter((b) => !(b.status === 'reading' && !b.finishedAt))
+
+  const byYear = new Map<number | typeof UNSCHEDULED, typeof rest>()
+  for (const book of rest) {
     const key = book.yearRead ?? UNSCHEDULED
     const list = byYear.get(key) ?? []
     list.push(book)
@@ -41,7 +56,8 @@ export default async function HomePage({
     return b - a
   })
 
-  const isFiltering = Boolean(q || genre || minRating || status)
+  const isFiltering = Boolean(q || genre || minRating)
+  const tabIsEmpty = isTbrTab ? toBeRead.length === 0 : currentReads.length === 0 && years.length === 0
 
   return (
     <main className="mx-auto max-w-2xl p-6">
@@ -68,7 +84,33 @@ export default async function HomePage({
       )}
 
       {books.length > 0 && (
+        <div className="mb-4 flex gap-4 border-b border-gray-200">
+          <Link
+            href={tabHref(params, 'library')}
+            className={`-mb-px border-b-2 px-1 py-2 text-sm font-medium ${
+              isTbrTab
+                ? 'border-transparent text-gray-500 hover:text-gray-700'
+                : 'border-indigo-600 text-indigo-600'
+            }`}
+          >
+            Library
+          </Link>
+          <Link
+            href={tabHref(params, 'tbr')}
+            className={`-mb-px border-b-2 px-1 py-2 text-sm font-medium ${
+              isTbrTab
+                ? 'border-indigo-600 text-indigo-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700'
+            }`}
+          >
+            To Be Read
+          </Link>
+        </div>
+      )}
+
+      {books.length > 0 && (
         <form method="GET" className="mb-6 flex flex-wrap gap-2">
+          <input type="hidden" name="tab" value={tab} />
           <input
             name="q"
             defaultValue={q}
@@ -99,18 +141,6 @@ export default async function HomePage({
               </option>
             ))}
           </select>
-          <select
-            name="status"
-            defaultValue={status}
-            className="rounded border border-gray-300 p-2"
-          >
-            <option value="">All statuses</option>
-            {Object.entries(STATUS_LABELS).map(([value, label]) => (
-              <option key={value} value={value}>
-                {label}
-              </option>
-            ))}
-          </select>
           <button
             type="submit"
             className="rounded border border-gray-300 px-4 py-2 hover:bg-gray-50"
@@ -119,7 +149,7 @@ export default async function HomePage({
           </button>
           {isFiltering && (
             <Link
-              href="/"
+              href={tabHref({ q: '', genre: '', minRating: '' }, tab)}
               className="rounded border border-gray-300 px-4 py-2 hover:bg-gray-50"
             >
               Clear
@@ -128,53 +158,48 @@ export default async function HomePage({
         </form>
       )}
 
-      {books.length > 0 && filtered.length === 0 && (
-        <p className="text-gray-500">No books match those filters.</p>
+      {books.length > 0 && tabIsEmpty && (
+        <p className="text-gray-500">
+          {isFiltering
+            ? 'No books match those filters.'
+            : isTbrTab
+              ? 'Nothing on your to-be-read pile yet.'
+              : 'No books in your library yet.'}
+        </p>
       )}
 
-      {years.map((year) => (
-        <section key={year} className="mb-8">
-          <h2 className="mb-3 text-lg font-semibold text-gray-700">
-            {year === UNSCHEDULED ? 'Unscheduled' : year}
-          </h2>
+      {isTbrTab && toBeRead.length > 0 && (
+        <ul className="space-y-2">
+          {toBeRead.map((book) => (
+            <BookListItem key={book.id} book={book} />
+          ))}
+        </ul>
+      )}
+
+      {!isTbrTab && currentReads.length > 0 && (
+        <section className="mb-8">
+          <h2 className="mb-3 text-lg font-semibold text-gray-700">Current Reads</h2>
           <ul className="space-y-2">
-            {byYear.get(year)!.map((book) => (
-              <li key={book.id}>
-                <Link
-                  href={`/books/${book.id}`}
-                  className="flex items-center justify-between rounded border border-gray-200 bg-white p-3 hover:bg-gray-50"
-                >
-                  <div className="flex flex-1 items-center justify-between gap-3">
-                    <div className="flex items-center gap-3">
-                      {book.coverImage && (
-                        // eslint-disable-next-line @next/next/no-img-element
-                        <img
-                          src={`/api/uploads/${book.coverImage}`}
-                          alt={`Cover of ${book.title || 'book'}`}
-                          className="h-12 w-auto rounded border border-gray-200"
-                        />
-                      )}
-                      <div>
-                        <p className="font-medium">{book.title || 'Untitled'}</p>
-                        <p className="text-sm text-gray-500">{book.author || 'Unknown author'}</p>
-                      </div>
-                    </div>
-                    <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
-                      {STATUS_LABELS[book.status]}
-                    </span>
-                  </div>
-                  <div className="flex items-center gap-2 pl-4">
-                    {book.rating === 0 && (
-                      <span className="text-sm text-gray-500">Not rated</span>
-                    )}
-                    <StarRating rating={book.rating} />
-                  </div>
-                </Link>
-              </li>
+            {currentReads.map((book) => (
+              <BookListItem key={book.id} book={book} />
             ))}
           </ul>
         </section>
-      ))}
+      )}
+
+      {!isTbrTab &&
+        years.map((year) => (
+          <section key={year} className="mb-8">
+            <h2 className="mb-3 text-lg font-semibold text-gray-700">
+              {year === UNSCHEDULED ? 'Unscheduled' : year}
+            </h2>
+            <ul className="space-y-2">
+              {byYear.get(year)!.map((book) => (
+                <BookListItem key={book.id} book={book} />
+              ))}
+            </ul>
+          </section>
+        ))}
     </main>
   )
 }
