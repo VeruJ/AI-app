@@ -23,7 +23,7 @@ export default function BookForm({
   submitLabel: string
 }) {
   return (
-    <form action={action} encType="multipart/form-data" className="space-y-4">
+    <form action={action} className="space-y-4">
       <div>
         <label className="block text-sm font-medium">Cover image</label>
         {initial?.coverImage && (
