@@ -21,12 +21,22 @@ export default async function BookPage({
         ← Back to your books
       </Link>
 
-      <div className="mt-4 flex items-start justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">{book.title}</h1>
-          <p className="text-gray-500">
-            {book.author} · {book.yearRead}
-          </p>
+      <div className="mt-4 flex items-start justify-between gap-4">
+        <div className="flex items-start gap-4">
+          {book.coverImage && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={`/api/uploads/${book.coverImage}`}
+              alt={`Cover of ${book.title}`}
+              className="h-24 w-auto rounded border border-gray-200"
+            />
+          )}
+          <div>
+            <h1 className="text-2xl font-bold">{book.title}</h1>
+            <p className="text-gray-500">
+              {book.author} · {book.yearRead}
+            </p>
+          </div>
         </div>
         <StarRating rating={book.rating} />
       </div>

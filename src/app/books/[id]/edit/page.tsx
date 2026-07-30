@@ -28,6 +28,7 @@ export default async function EditBookPage({
           thoughts: book.thoughts,
           quotes: book.quotes.join('\n'),
           yearRead: book.yearRead,
+          coverImage: book.coverImage ?? '',
         }}
       />
     </main>
