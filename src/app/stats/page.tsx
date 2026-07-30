@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { listBooks } from '@/lib/data'
+import { listBooks, STATUS_LABELS, type BookStatus } from '@/lib/data'
 
 export const dynamic = 'force-dynamic'
 
@@ -8,9 +8,15 @@ export default async function StatsPage() {
 
   const byYear = new Map<number, number>()
   for (const book of books) {
+    if (book.yearRead === undefined) continue
     byYear.set(book.yearRead, (byYear.get(book.yearRead) ?? 0) + 1)
   }
   const years = [...byYear.keys()].sort((a, b) => b - a)
+
+  const byStatus = new Map<BookStatus, number>()
+  for (const book of books) {
+    byStatus.set(book.status, (byStatus.get(book.status) ?? 0) + 1)
+  }
 
   const avgRating = books.length
     ? books.reduce((sum, b) => sum + b.rating, 0) / books.length
@@ -38,9 +44,21 @@ export default async function StatsPage() {
           <section className="mb-6">
             <h2 className="mb-2 text-lg font-semibold">Overview</h2>
             <p className="text-gray-700">
-              {books.length} book{books.length === 1 ? '' : 's'} read · average
+              {books.length} book{books.length === 1 ? '' : 's'} tracked · average
               rating {avgRating.toFixed(1)} / 5
             </p>
+          </section>
+
+          <section className="mb-6">
+            <h2 className="mb-2 text-lg font-semibold">By status</h2>
+            <ul className="space-y-1">
+              {(Object.keys(STATUS_LABELS) as BookStatus[]).map((status) => (
+                <li key={status} className="flex items-center justify-between">
+                  <span>{STATUS_LABELS[status]}</span>
+                  <span className="text-gray-500">{byStatus.get(status) ?? 0}</span>
+                </li>
+              ))}
+            </ul>
           </section>
 
           <section className="mb-6">

@@ -1,15 +1,20 @@
 import { readFile, writeFile, mkdir } from 'node:fs/promises'
 import path from 'node:path'
 
+export type { BookStatus } from './bookStatus'
+export { STATUS_LABELS } from './bookStatus'
+import type { BookStatus } from './bookStatus'
+
 export type Book = {
   id: number
   title: string
   author: string
   genres: string[]
+  status: BookStatus
   rating: number
   thoughts: string
   quotes: string[]
-  yearRead: number
+  yearRead?: number
   createdAt: string
   startedAt?: string
   finishedAt?: string
@@ -22,10 +27,11 @@ export type BookInput = {
   title: string
   author: string
   genres: string[]
+  status?: BookStatus
   rating: number
   thoughts: string
   quotes: string[]
-  yearRead: number
+  yearRead?: number
   startedAt?: string
   finishedAt?: string
   pagesRead?: number
@@ -40,7 +46,11 @@ const EMPTY: Data = { books: [] }
 
 async function readAll(): Promise<Data> {
   try {
-    return JSON.parse(await readFile(FILE, 'utf8')) as Data
+    const data = JSON.parse(await readFile(FILE, 'utf8')) as Data
+    // Older records predate the status field. They already carry a rating and
+    // year read, so treat them as finished books rather than leaving them undefined.
+    data.books = data.books.map((b) => ({ ...b, status: b.status ?? 'read' }))
+    return data
   } catch {
     return structuredClone(EMPTY)
   }
@@ -77,7 +87,12 @@ export async function getBook(id: number): Promise<Book | undefined> {
 export function addBook(input: BookInput): Promise<number> {
   return update((data) => {
     const id = Math.max(0, ...data.books.map((b) => b.id)) + 1
-    data.books.push({ id, ...input, createdAt: new Date().toISOString() })
+    data.books.push({
+      status: 'tbr',
+      ...input,
+      id,
+      createdAt: new Date().toISOString(),
+    })
     return id
   })
 }

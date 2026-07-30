@@ -1,15 +1,17 @@
 import Link from 'next/link'
-import { listBooks } from '@/lib/data'
+import { listBooks, STATUS_LABELS } from '@/lib/data'
 import StarRating from '@/components/StarRating'
 
 export const dynamic = 'force-dynamic'
 
+const UNSCHEDULED = 'unscheduled' as const
+
 export default async function HomePage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; genre?: string; minRating?: string }>
+  searchParams: Promise<{ q?: string; genre?: string; minRating?: string; status?: string }>
 }) {
-  const { q = '', genre = '', minRating = '' } = await searchParams
+  const { q = '', genre = '', minRating = '', status = '' } = await searchParams
   const books = await listBooks()
 
   const allGenres = [...new Set(books.flatMap((b) => b.genres))].sort()
@@ -22,18 +24,24 @@ export default async function HomePage({
       book.author.toLowerCase().includes(query)
     const matchesGenre = !genre || book.genres.includes(genre)
     const matchesRating = !minRating || book.rating >= Number(minRating)
-    return matchesQuery && matchesGenre && matchesRating
+    const matchesStatus = !status || book.status === status
+    return matchesQuery && matchesGenre && matchesRating && matchesStatus
   })
 
-  const byYear = new Map<number, typeof filtered>()
+  const byYear = new Map<number | typeof UNSCHEDULED, typeof filtered>()
   for (const book of filtered) {
-    const list = byYear.get(book.yearRead) ?? []
+    const key = book.yearRead ?? UNSCHEDULED
+    const list = byYear.get(key) ?? []
     list.push(book)
-    byYear.set(book.yearRead, list)
+    byYear.set(key, list)
   }
-  const years = [...byYear.keys()].sort((a, b) => b - a)
+  const years = [...byYear.keys()].sort((a, b) => {
+    if (a === UNSCHEDULED) return -1
+    if (b === UNSCHEDULED) return 1
+    return b - a
+  })
 
-  const isFiltering = Boolean(q || genre || minRating)
+  const isFiltering = Boolean(q || genre || minRating || status)
 
   return (
     <main className="mx-auto max-w-2xl p-6">
@@ -91,6 +99,18 @@ export default async function HomePage({
               </option>
             ))}
           </select>
+          <select
+            name="status"
+            defaultValue={status}
+            className="rounded border border-gray-300 p-2"
+          >
+            <option value="">All statuses</option>
+            {Object.entries(STATUS_LABELS).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
           <button
             type="submit"
             className="rounded border border-gray-300 px-4 py-2 hover:bg-gray-50"
@@ -114,7 +134,9 @@ export default async function HomePage({
 
       {years.map((year) => (
         <section key={year} className="mb-8">
-          <h2 className="mb-3 text-lg font-semibold text-gray-700">{year}</h2>
+          <h2 className="mb-3 text-lg font-semibold text-gray-700">
+            {year === UNSCHEDULED ? 'Not yet read' : year}
+          </h2>
           <ul className="space-y-2">
             {byYear.get(year)!.map((book) => (
               <li key={book.id}>
@@ -127,16 +149,19 @@ export default async function HomePage({
                       // eslint-disable-next-line @next/next/no-img-element
                       <img
                         src={`/api/uploads/${book.coverImage}`}
-                        alt={`Cover of ${book.title}`}
+                        alt={`Cover of ${book.title || 'book'}`}
                         className="h-12 w-auto rounded border border-gray-200"
                       />
                     )}
                     <div>
-                      <p className="font-medium">{book.title}</p>
-                      <p className="text-sm text-gray-500">{book.author}</p>
+                      <p className="font-medium">{book.title || 'Untitled'}</p>
+                      <p className="text-sm text-gray-500">{book.author || 'Unknown author'}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
+                    <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
+                      {STATUS_LABELS[book.status]}
+                    </span>
                     <span className="text-sm text-gray-500">
                       {book.rating > 0 ? `${book.rating} / 5` : 'Not rated'}
                     </span>
