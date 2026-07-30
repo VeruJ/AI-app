@@ -1,5 +1,7 @@
+import { ratingToPercent } from '@/lib/rating'
+
 export default function StarRating({ rating }: { rating: number }) {
-  const percent = (Math.max(0, Math.min(5, rating)) / 5) * 100
+  const percent = ratingToPercent(rating)
 
   return (
     <span
