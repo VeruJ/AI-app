@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import StarRatingInput from './StarRatingInput'
 
 type BookFormValues = {
   title: string
@@ -21,8 +21,6 @@ export default function BookForm({
   initial?: Partial<BookFormValues>
   submitLabel: string
 }) {
-  const [rating, setRating] = useState(initial?.rating ?? 0)
-
   return (
     <form action={action} className="space-y-4">
       <div>
@@ -67,17 +65,8 @@ export default function BookForm({
       </div>
 
       <div>
-        <label className="block text-sm font-medium">Rating ({rating} / 5)</label>
-        <input
-          name="rating"
-          type="range"
-          min={0}
-          max={5}
-          step={0.5}
-          value={rating}
-          onChange={(e) => setRating(Number(e.target.value))}
-          className="mt-1 w-full"
-        />
+        <label className="mb-1 block text-sm font-medium">Rating</label>
+        <StarRatingInput name="rating" defaultValue={initial?.rating ?? 0} />
       </div>
 
       <div>
