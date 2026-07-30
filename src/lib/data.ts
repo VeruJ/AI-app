@@ -11,6 +11,10 @@ export type Book = {
   quotes: string[]
   yearRead: number
   createdAt: string
+  startedAt?: string
+  finishedAt?: string
+  pagesRead?: number
+  totalPages?: number
   coverImage?: string
 }
 
@@ -22,6 +26,10 @@ export type BookInput = {
   thoughts: string
   quotes: string[]
   yearRead: number
+  startedAt?: string
+  finishedAt?: string
+  pagesRead?: number
+  totalPages?: number
   coverImage?: string
 }
 

@@ -10,6 +10,10 @@ type BookFormValues = {
   thoughts: string
   quotes: string
   yearRead: number
+  startedAt: string
+  finishedAt: string
+  pagesRead: number
+  totalPages: number
   coverImage: string
 }
 
@@ -81,6 +85,50 @@ export default function BookForm({
           required
           className="mt-1 w-full rounded border border-gray-300 p-2"
         />
+      </div>
+
+      <div className="flex gap-4">
+        <div className="flex-1">
+          <label className="block text-sm font-medium">Started reading</label>
+          <input
+            name="startedAt"
+            type="date"
+            defaultValue={initial?.startedAt}
+            className="mt-1 w-full rounded border border-gray-300 p-2"
+          />
+        </div>
+        <div className="flex-1">
+          <label className="block text-sm font-medium">Finished reading</label>
+          <input
+            name="finishedAt"
+            type="date"
+            defaultValue={initial?.finishedAt}
+            className="mt-1 w-full rounded border border-gray-300 p-2"
+          />
+        </div>
+      </div>
+
+      <div className="flex gap-4">
+        <div className="flex-1">
+          <label className="block text-sm font-medium">Pages read</label>
+          <input
+            name="pagesRead"
+            type="number"
+            min={0}
+            defaultValue={initial?.pagesRead}
+            className="mt-1 w-full rounded border border-gray-300 p-2"
+          />
+        </div>
+        <div className="flex-1">
+          <label className="block text-sm font-medium">Total pages</label>
+          <input
+            name="totalPages"
+            type="number"
+            min={0}
+            defaultValue={initial?.totalPages}
+            className="mt-1 w-full rounded border border-gray-300 p-2"
+          />
+        </div>
       </div>
 
       <div>

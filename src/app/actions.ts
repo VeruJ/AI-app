@@ -33,6 +33,13 @@ async function parseForm(formData: FormData): Promise<BookInput> {
     .map((q) => q.trim())
     .filter(Boolean)
 
+  const startedAt = String(formData.get('startedAt') ?? '') || undefined
+  const finishedAt = String(formData.get('finishedAt') ?? '') || undefined
+  const pagesReadRaw = formData.get('pagesRead')
+  const totalPagesRaw = formData.get('totalPages')
+  const pagesRead = pagesReadRaw ? Number(pagesReadRaw) : undefined
+  const totalPages = totalPagesRaw ? Number(totalPagesRaw) : undefined
+
   const cover = formData.get('cover')
   const coverImage =
     cover instanceof File && cover.size > 0 ? await saveCover(cover) : undefined
@@ -48,6 +55,10 @@ async function parseForm(formData: FormData): Promise<BookInput> {
     thoughts: String(formData.get('thoughts') ?? ''),
     quotes,
     yearRead: Number.isFinite(year) && year > 0 ? year : new Date().getFullYear(),
+    startedAt,
+    finishedAt,
+    pagesRead,
+    totalPages,
     coverImage,
   }
 }
