@@ -135,7 +135,7 @@ export default async function HomePage({
       {years.map((year) => (
         <section key={year} className="mb-8">
           <h2 className="mb-3 text-lg font-semibold text-gray-700">
-            {year === UNSCHEDULED ? 'Not yet read' : year}
+            {year === UNSCHEDULED ? 'Unscheduled' : year}
           </h2>
           <ul className="space-y-2">
             {byYear.get(year)!.map((book) => (
@@ -144,27 +144,29 @@ export default async function HomePage({
                   href={`/books/${book.id}`}
                   className="flex items-center justify-between rounded border border-gray-200 bg-white p-3 hover:bg-gray-50"
                 >
-                  <div className="flex items-center gap-3">
-                    {book.coverImage && (
-                      // eslint-disable-next-line @next/next/no-img-element
-                      <img
-                        src={`/api/uploads/${book.coverImage}`}
-                        alt={`Cover of ${book.title || 'book'}`}
-                        className="h-12 w-auto rounded border border-gray-200"
-                      />
-                    )}
-                    <div>
-                      <p className="font-medium">{book.title || 'Untitled'}</p>
-                      <p className="text-sm text-gray-500">{book.author || 'Unknown author'}</p>
+                  <div className="flex flex-1 items-center justify-between gap-3">
+                    <div className="flex items-center gap-3">
+                      {book.coverImage && (
+                        // eslint-disable-next-line @next/next/no-img-element
+                        <img
+                          src={`/api/uploads/${book.coverImage}`}
+                          alt={`Cover of ${book.title || 'book'}`}
+                          className="h-12 w-auto rounded border border-gray-200"
+                        />
+                      )}
+                      <div>
+                        <p className="font-medium">{book.title || 'Untitled'}</p>
+                        <p className="text-sm text-gray-500">{book.author || 'Unknown author'}</p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-2">
                     <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
                       {STATUS_LABELS[book.status]}
                     </span>
-                    <span className="text-sm text-gray-500">
-                      {book.rating > 0 ? `${book.rating} / 5` : 'Not rated'}
-                    </span>
+                  </div>
+                  <div className="flex items-center gap-2 pl-4">
+                    {book.rating === 0 && (
+                      <span className="text-sm text-gray-500">Not rated</span>
+                    )}
                     <StarRating rating={book.rating} />
                   </div>
                 </Link>
