@@ -24,6 +24,7 @@ export default async function EditBookPage({
           title: book.title,
           author: book.author,
           status: book.status,
+          format: book.format,
           genres: book.genres.join(', '),
           rating: book.rating,
           thoughts: book.thoughts,

@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { getBook, STATUS_LABELS } from '@/lib/data'
+import { getBook, STATUS_LABELS, FORMAT_LABELS } from '@/lib/data'
 import { removeBook } from '@/app/actions'
 import StarRating from '@/components/StarRating'
 import DeleteBookButton from '@/components/DeleteBookButton'
@@ -43,6 +43,9 @@ export default async function BookPage({
         <div className="flex flex-col items-end gap-2">
           <span className="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-600">
             {STATUS_LABELS[book.status]}
+          </span>
+          <span className="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-600">
+            {FORMAT_LABELS[book.format]}
           </span>
           <StarRating rating={book.rating} />
         </div>
