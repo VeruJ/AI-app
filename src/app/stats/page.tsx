@@ -1,33 +1,29 @@
 import Link from 'next/link'
-import { listBooks, STATUS_LABELS, type BookStatus } from '@/lib/data'
+import { listBooks, type Book } from '@/lib/data'
+import { yearOf } from '@/lib/dates'
 import HorizontalBars from '@/components/HorizontalBars'
 
 export const dynamic = 'force-dynamic'
 
-// Fixed categorical order (tbr, reading, read) — never reassigned by count or filter.
-const STATUS_COLORS: Record<BookStatus, string> = {
-  tbr: '#2a78d6',
-  reading: '#eb6834',
-  read: '#1baf7a',
-}
-
-// Sequential: one hue for plain magnitude comparisons (years, genres).
+// Sequential: one hue for plain magnitude comparisons (genres).
 const SEQUENTIAL_HUE = '#2a78d6'
+
+const TOP_GENRES_LIMIT = 5
 
 export default async function StatsPage() {
   const books = await listBooks()
 
-  const byYear = new Map<number, number>()
+  const byYear = new Map<number, Book[]>()
   for (const book of books) {
-    if (book.yearRead === undefined) continue
-    byYear.set(book.yearRead, (byYear.get(book.yearRead) ?? 0) + 1)
+    const year = book.yearRead ?? yearOf(book.finishedAt) ?? yearOf(book.startedAt)
+    if (year === undefined) continue
+    const list = byYear.get(year) ?? []
+    list.push(book)
+    byYear.set(year, list)
   }
   const years = [...byYear.keys()].sort((a, b) => b - a)
 
-  const byStatus = new Map<BookStatus, number>()
-  for (const book of books) {
-    byStatus.set(book.status, (byStatus.get(book.status) ?? 0) + 1)
-  }
+  const booksRead = books.filter((b) => b.status === 'read').length
 
   const avgRating = books.length
     ? books.reduce((sum, b) => sum + b.rating, 0) / books.length
@@ -39,7 +35,7 @@ export default async function StatsPage() {
       genreCounts.set(genre, (genreCounts.get(genre) ?? 0) + 1)
     }
   }
-  const genres = [...genreCounts.entries()].sort((a, b) => b[1] - a[1])
+  const genres = [...genreCounts.entries()].sort((a, b) => b[1] - a[1]).slice(0, TOP_GENRES_LIMIT)
 
   return (
     <main className="mx-auto max-w-2xl p-6">
@@ -58,20 +54,13 @@ export default async function StatsPage() {
               <p className="text-3xl font-semibold">{books.length}</p>
             </div>
             <div>
+              <p className="text-sm text-gray-500">Books read</p>
+              <p className="text-3xl font-semibold">{booksRead}</p>
+            </div>
+            <div>
               <p className="text-sm text-gray-500">Average rating</p>
               <p className="text-3xl font-semibold">{avgRating.toFixed(1)} / 5</p>
             </div>
-          </section>
-
-          <section className="mb-6">
-            <h2 className="mb-2 text-lg font-semibold">By status</h2>
-            <HorizontalBars
-              items={(Object.keys(STATUS_LABELS) as BookStatus[]).map((status) => ({
-                label: STATUS_LABELS[status],
-                value: byStatus.get(status) ?? 0,
-                color: STATUS_COLORS[status],
-              }))}
-            />
           </section>
 
           <section className="mb-6">
@@ -79,13 +68,40 @@ export default async function StatsPage() {
             {years.length === 0 ? (
               <p className="text-gray-500">No books with a year read yet.</p>
             ) : (
-              <HorizontalBars
-                items={years.map((year) => ({
-                  label: String(year),
-                  value: byYear.get(year) ?? 0,
-                  color: SEQUENTIAL_HUE,
-                }))}
-              />
+              <div className="space-y-4">
+                {years.map((year) => {
+                  const yearBooks = byYear.get(year)!
+                  return (
+                    <div key={year}>
+                      <p className="mb-2 text-sm font-medium text-gray-600">
+                        {year} · {yearBooks.length} book{yearBooks.length === 1 ? '' : 's'}
+                      </p>
+                      <div className="flex flex-wrap gap-2">
+                        {yearBooks.map((book) => (
+                          <Link
+                            key={book.id}
+                            href={`/books/${book.id}`}
+                            title={`${book.title || 'Untitled'} — ${book.author || 'Unknown author'}`}
+                          >
+                            {book.coverImage ? (
+                              // eslint-disable-next-line @next/next/no-img-element
+                              <img
+                                src={`/api/uploads/${book.coverImage}`}
+                                alt={`Cover of ${book.title || 'book'}`}
+                                className="h-24 w-16 rounded border border-gray-200 object-cover"
+                              />
+                            ) : (
+                              <div className="flex h-24 w-16 items-center justify-center rounded border border-gray-200 bg-gray-100 p-1 text-center text-[10px] text-gray-500">
+                                {book.title || 'Untitled'}
+                              </div>
+                            )}
+                          </Link>
+                        ))}
+                      </div>
+                    </div>
+                  )
+                })}
+              </div>
             )}
           </section>
 
