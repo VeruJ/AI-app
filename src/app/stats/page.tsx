@@ -1,7 +1,18 @@
 import Link from 'next/link'
 import { listBooks, STATUS_LABELS, type BookStatus } from '@/lib/data'
+import HorizontalBars from '@/components/HorizontalBars'
 
 export const dynamic = 'force-dynamic'
+
+// Fixed categorical order (tbr, reading, read) — never reassigned by count or filter.
+const STATUS_COLORS: Record<BookStatus, string> = {
+  tbr: '#2a78d6',
+  reading: '#eb6834',
+  read: '#1baf7a',
+}
+
+// Sequential: one hue for plain magnitude comparisons (years, genres).
+const SEQUENTIAL_HUE = '#2a78d6'
 
 export default async function StatsPage() {
   const books = await listBooks()
@@ -41,38 +52,41 @@ export default async function StatsPage() {
         <p className="text-gray-500">No books yet — add some to see stats.</p>
       ) : (
         <>
-          <section className="mb-6">
-            <h2 className="mb-2 text-lg font-semibold">Overview</h2>
-            <p className="text-gray-700">
-              {books.length} book{books.length === 1 ? '' : 's'} tracked · average
-              rating {avgRating.toFixed(1)} / 5
-            </p>
+          <section className="mb-6 flex gap-6">
+            <div>
+              <p className="text-sm text-gray-500">Books tracked</p>
+              <p className="text-3xl font-semibold">{books.length}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Average rating</p>
+              <p className="text-3xl font-semibold">{avgRating.toFixed(1)} / 5</p>
+            </div>
           </section>
 
           <section className="mb-6">
             <h2 className="mb-2 text-lg font-semibold">By status</h2>
-            <ul className="space-y-1">
-              {(Object.keys(STATUS_LABELS) as BookStatus[]).map((status) => (
-                <li key={status} className="flex items-center justify-between">
-                  <span>{STATUS_LABELS[status]}</span>
-                  <span className="text-gray-500">{byStatus.get(status) ?? 0}</span>
-                </li>
-              ))}
-            </ul>
+            <HorizontalBars
+              items={(Object.keys(STATUS_LABELS) as BookStatus[]).map((status) => ({
+                label: STATUS_LABELS[status],
+                value: byStatus.get(status) ?? 0,
+                color: STATUS_COLORS[status],
+              }))}
+            />
           </section>
 
           <section className="mb-6">
             <h2 className="mb-2 text-lg font-semibold">Books per year</h2>
-            <ul className="space-y-1">
-              {years.map((year) => (
-                <li key={year} className="flex items-center justify-between">
-                  <span>{year}</span>
-                  <span className="text-gray-500">
-                    {byYear.get(year)} book{byYear.get(year) === 1 ? '' : 's'}
-                  </span>
-                </li>
-              ))}
-            </ul>
+            {years.length === 0 ? (
+              <p className="text-gray-500">No books with a year read yet.</p>
+            ) : (
+              <HorizontalBars
+                items={years.map((year) => ({
+                  label: String(year),
+                  value: byYear.get(year) ?? 0,
+                  color: SEQUENTIAL_HUE,
+                }))}
+              />
+            )}
           </section>
 
           <section>
@@ -80,14 +94,13 @@ export default async function StatsPage() {
             {genres.length === 0 ? (
               <p className="text-gray-500">No genre tags yet.</p>
             ) : (
-              <ul className="space-y-1">
-                {genres.map(([genre, count]) => (
-                  <li key={genre} className="flex items-center justify-between">
-                    <span>{genre}</span>
-                    <span className="text-gray-500">{count}</span>
-                  </li>
-                ))}
-              </ul>
+              <HorizontalBars
+                items={genres.map(([genre, count]) => ({
+                  label: genre,
+                  value: count,
+                  color: SEQUENTIAL_HUE,
+                }))}
+              />
             )}
           </section>
         </>
