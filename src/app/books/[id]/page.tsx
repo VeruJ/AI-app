@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { getBook } from '@/lib/data'
+import { getBook, STATUS_LABELS } from '@/lib/data'
 import { removeBook } from '@/app/actions'
 import StarRating from '@/components/StarRating'
 import DeleteBookButton from '@/components/DeleteBookButton'
@@ -28,18 +28,24 @@ export default async function BookPage({
             // eslint-disable-next-line @next/next/no-img-element
             <img
               src={`/api/uploads/${book.coverImage}`}
-              alt={`Cover of ${book.title}`}
+              alt={`Cover of ${book.title || 'book'}`}
               className="h-24 w-auto rounded border border-gray-200"
             />
           )}
           <div>
-            <h1 className="text-2xl font-bold">{book.title}</h1>
+            <h1 className="text-2xl font-bold">{book.title || 'Untitled'}</h1>
             <p className="text-gray-500">
-              {book.author} · {book.yearRead}
+              {book.author || 'Unknown author'}
+              {book.yearRead ? ` · ${book.yearRead}` : ''}
             </p>
           </div>
         </div>
-        <StarRating rating={book.rating} />
+        <div className="flex flex-col items-end gap-2">
+          <span className="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-600">
+            {STATUS_LABELS[book.status]}
+          </span>
+          <StarRating rating={book.rating} />
+        </div>
       </div>
 
       {book.genres.length > 0 && (

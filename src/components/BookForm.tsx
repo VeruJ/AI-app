@@ -1,11 +1,13 @@
 'use client'
 
 import StarRatingInput from './StarRatingInput'
+import { STATUS_LABELS, type BookStatus } from '@/lib/bookStatus'
 
 type BookFormValues = {
   title: string
   author: string
   genres: string
+  status: BookStatus
   rating: number
   thoughts: string
   quotes: string
@@ -51,7 +53,6 @@ export default function BookForm({
         <input
           name="title"
           defaultValue={initial?.title}
-          required
           className="mt-1 w-full rounded border border-gray-300 p-2"
         />
       </div>
@@ -61,9 +62,23 @@ export default function BookForm({
         <input
           name="author"
           defaultValue={initial?.author}
-          required
           className="mt-1 w-full rounded border border-gray-300 p-2"
         />
+      </div>
+
+      <div>
+        <label className="block text-sm font-medium">Status</label>
+        <select
+          name="status"
+          defaultValue={initial?.status ?? 'tbr'}
+          className="mt-1 w-full rounded border border-gray-300 p-2"
+        >
+          {Object.entries(STATUS_LABELS).map(([value, label]) => (
+            <option key={value} value={value}>
+              {label}
+            </option>
+          ))}
+        </select>
       </div>
 
       <div>
@@ -81,8 +96,7 @@ export default function BookForm({
         <input
           name="dateRead"
           type="date"
-          defaultValue={`${initial?.yearRead ?? new Date().getFullYear()}-01-01`}
-          required
+          defaultValue={initial?.yearRead ? `${initial.yearRead}-01-01` : undefined}
           className="mt-1 w-full rounded border border-gray-300 p-2"
         />
       </div>
