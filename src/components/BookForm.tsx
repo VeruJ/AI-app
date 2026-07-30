@@ -56,11 +56,11 @@ export default function BookForm({
       </div>
 
       <div>
-        <label className="block text-sm font-medium">Year read</label>
+        <label className="block text-sm font-medium">Date read</label>
         <input
-          name="yearRead"
-          type="number"
-          defaultValue={initial?.yearRead ?? new Date().getFullYear()}
+          name="dateRead"
+          type="date"
+          defaultValue={`${initial?.yearRead ?? new Date().getFullYear()}-01-01`}
           required
           className="mt-1 w-full rounded border border-gray-300 p-2"
         />
