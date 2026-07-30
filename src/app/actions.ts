@@ -1,10 +1,29 @@
 'use server'
 
+import { writeFile, mkdir } from 'node:fs/promises'
+import path from 'node:path'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { addBook, updateBook, deleteBook, type BookInput } from '@/lib/data'
 
-function parseForm(formData: FormData): BookInput {
+const MAX_COVER_SIZE = 5_000_000
+
+async function saveCover(file: File): Promise<string> {
+  if (file.size > MAX_COVER_SIZE) {
+    throw new Error('Cover image is larger than 5 MB')
+  }
+
+  const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_')
+  const name = `${Date.now()}-${safeName}`
+  const dir = path.join(process.cwd(), 'data', 'uploads')
+
+  await mkdir(dir, { recursive: true })
+  await writeFile(path.join(dir, name), Buffer.from(await file.arrayBuffer()))
+
+  return name
+}
+
+async function parseForm(formData: FormData): Promise<BookInput> {
   const genres = String(formData.get('genres') ?? '')
     .split(',')
     .map((g) => g.trim())
@@ -13,6 +32,10 @@ function parseForm(formData: FormData): BookInput {
     .split('\n')
     .map((q) => q.trim())
     .filter(Boolean)
+
+  const cover = formData.get('cover')
+  const coverImage =
+    cover instanceof File && cover.size > 0 ? await saveCover(cover) : undefined
 
   const dateRead = String(formData.get('dateRead') ?? '')
   const year = Number(dateRead.split('-')[0])
@@ -25,18 +48,19 @@ function parseForm(formData: FormData): BookInput {
     thoughts: String(formData.get('thoughts') ?? ''),
     quotes,
     yearRead: Number.isFinite(year) && year > 0 ? year : new Date().getFullYear(),
+    coverImage,
   }
 }
 
 export async function createBook(formData: FormData) {
-  const input = parseForm(formData)
+  const input = await parseForm(formData)
   const id = await addBook(input)
   revalidatePath('/')
   redirect(`/books/${id}`)
 }
 
 export async function editBook(id: number, formData: FormData) {
-  const input = parseForm(formData)
+  const input = await parseForm(formData)
   await updateBook(id, input)
   revalidatePath('/')
   revalidatePath(`/books/${id}`)

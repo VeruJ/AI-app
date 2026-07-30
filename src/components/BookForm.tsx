@@ -10,6 +10,7 @@ type BookFormValues = {
   thoughts: string
   quotes: string
   yearRead: number
+  coverImage: string
 }
 
 export default function BookForm({
@@ -23,6 +24,24 @@ export default function BookForm({
 }) {
   return (
     <form action={action} className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium">Cover image</label>
+        {initial?.coverImage && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={`/api/uploads/${initial.coverImage}`}
+            alt="Current cover"
+            className="mt-1 h-32 w-auto rounded border border-gray-200"
+          />
+        )}
+        <input
+          name="cover"
+          type="file"
+          accept="image/*"
+          className="mt-1 w-full rounded border border-gray-300 p-2"
+        />
+      </div>
+
       <div>
         <label className="block text-sm font-medium">Title</label>
         <input

@@ -122,9 +122,19 @@ export default async function HomePage({
                   href={`/books/${book.id}`}
                   className="flex items-center justify-between rounded border border-gray-200 bg-white p-3 hover:bg-gray-50"
                 >
-                  <div>
-                    <p className="font-medium">{book.title}</p>
-                    <p className="text-sm text-gray-500">{book.author}</p>
+                  <div className="flex items-center gap-3">
+                    {book.coverImage && (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={`/api/uploads/${book.coverImage}`}
+                        alt={`Cover of ${book.title}`}
+                        className="h-12 w-auto rounded border border-gray-200"
+                      />
+                    )}
+                    <div>
+                      <p className="font-medium">{book.title}</p>
+                      <p className="text-sm text-gray-500">{book.author}</p>
+                    </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <span className="text-sm text-gray-500">
