@@ -11,7 +11,6 @@ type BookFormValues = {
   rating: number
   thoughts: string
   quotes: string
-  yearRead: number
   startedAt: string
   finishedAt: string
   pagesRead: number
@@ -87,16 +86,6 @@ export default function BookForm({
           name="genres"
           defaultValue={initial?.genres}
           placeholder="fantasy, classic"
-          className="mt-1 w-full rounded border border-gray-300 p-2"
-        />
-      </div>
-
-      <div>
-        <label className="block text-sm font-medium">Date read</label>
-        <input
-          name="dateRead"
-          type="date"
-          defaultValue={initial?.yearRead ? `${initial.yearRead}-01-01` : undefined}
           className="mt-1 w-full rounded border border-gray-300 p-2"
         />
       </div>

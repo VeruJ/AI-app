@@ -44,20 +44,24 @@ async function parseForm(formData: FormData): Promise<BookInput> {
   const coverImage =
     cover instanceof File && cover.size > 0 ? await saveCover(cover) : undefined
 
-  const dateRead = String(formData.get('dateRead') ?? '')
-  const year = Number(dateRead.split('-')[0])
-  const yearRead = dateRead && Number.isFinite(year) && year > 0 ? year : undefined
+  const yearOf = (date: string | undefined) => {
+    const year = Number(date?.split('-')[0])
+    return date && Number.isFinite(year) && year > 0 ? year : undefined
+  }
+  const yearRead = yearOf(finishedAt) ?? yearOf(startedAt)
 
   const statusRaw = String(formData.get('status') ?? '')
   const status: BookStatus =
     statusRaw === 'reading' || statusRaw === 'read' ? statusRaw : 'tbr'
 
+  const rating = Math.max(0, Math.min(5, Number(formData.get('rating') ?? 0)))
+
   return {
-    title: String(formData.get('title') ?? ''),
-    author: String(formData.get('author') ?? ''),
+    title: String(formData.get('title') ?? '').trim(),
+    author: String(formData.get('author') ?? '').trim(),
     genres,
     status,
-    rating: Number(formData.get('rating') ?? 0),
+    rating,
     thoughts: String(formData.get('thoughts') ?? ''),
     quotes,
     yearRead,
