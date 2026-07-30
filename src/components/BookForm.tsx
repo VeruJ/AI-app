@@ -15,7 +15,6 @@ type BookFormValues = {
   quotes: string
   startedAt: string
   finishedAt: string
-  pagesRead: number
   totalPages: number
   coverImage: string
 }
@@ -129,27 +128,15 @@ export default function BookForm({
         </div>
       </div>
 
-      <div className="flex gap-4">
-        <div className="flex-1">
-          <label className="block text-sm font-medium">Pages read</label>
-          <input
-            name="pagesRead"
-            type="number"
-            min={0}
-            defaultValue={initial?.pagesRead}
-            className="mt-1 w-full rounded border border-gray-300 p-2"
-          />
-        </div>
-        <div className="flex-1">
-          <label className="block text-sm font-medium">Total pages</label>
-          <input
-            name="totalPages"
-            type="number"
-            min={0}
-            defaultValue={initial?.totalPages}
-            className="mt-1 w-full rounded border border-gray-300 p-2"
-          />
-        </div>
+      <div>
+        <label className="block text-sm font-medium">Total pages</label>
+        <input
+          name="totalPages"
+          type="number"
+          min={0}
+          defaultValue={initial?.totalPages}
+          className="mt-1 w-full rounded border border-gray-300 p-2"
+        />
       </div>
 
       <div>
