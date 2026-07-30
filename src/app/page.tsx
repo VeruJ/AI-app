@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import { listBooks } from '@/lib/data'
+import { yearOf } from '@/lib/dates'
 import BookListItem from '@/components/BookListItem'
 
 export const dynamic = 'force-dynamic'
@@ -45,7 +46,7 @@ export default async function HomePage({
 
   const byYear = new Map<number | typeof UNSCHEDULED, typeof rest>()
   for (const book of rest) {
-    const key = book.yearRead ?? UNSCHEDULED
+    const key = book.yearRead ?? yearOf(book.finishedAt) ?? yearOf(book.startedAt) ?? UNSCHEDULED
     const list = byYear.get(key) ?? []
     list.push(book)
     byYear.set(key, list)

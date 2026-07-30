@@ -5,6 +5,7 @@ import path from 'node:path'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
 import { addBook, updateBook, deleteBook, type BookInput, type BookStatus } from '@/lib/data'
+import { yearOf } from '@/lib/dates'
 
 const MAX_COVER_SIZE = 5_000_000
 
@@ -44,10 +45,6 @@ async function parseForm(formData: FormData): Promise<BookInput> {
   const coverImage =
     cover instanceof File && cover.size > 0 ? await saveCover(cover) : undefined
 
-  const yearOf = (date: string | undefined) => {
-    const year = Number(date?.split('-')[0])
-    return date && Number.isFinite(year) && year > 0 ? year : undefined
-  }
   const yearRead = yearOf(finishedAt) ?? yearOf(startedAt)
 
   const statusRaw = String(formData.get('status') ?? '')
