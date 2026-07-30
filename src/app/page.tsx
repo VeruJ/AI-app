@@ -45,7 +45,12 @@ export default async function HomePage() {
                     <p className="font-medium">{book.title}</p>
                     <p className="text-sm text-gray-500">{book.author}</p>
                   </div>
-                  <StarRating rating={book.rating} />
+                  <div className="flex items-center gap-2">
+                    <span className="text-sm text-gray-500">
+                      {book.rating > 0 ? `${book.rating} / 5` : 'Not rated'}
+                    </span>
+                    <StarRating rating={book.rating} />
+                  </div>
                 </Link>
               </li>
             ))}
