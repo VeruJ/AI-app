@@ -30,7 +30,6 @@ export default async function EditBookPage({
           quotes: book.quotes.join('\n'),
           startedAt: book.startedAt ?? '',
           finishedAt: book.finishedAt ?? '',
-          pagesRead: book.pagesRead,
           totalPages: book.totalPages,
           coverImage: book.coverImage ?? '',
         }}
