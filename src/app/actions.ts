@@ -37,6 +37,9 @@ async function parseForm(formData: FormData): Promise<BookInput> {
   const coverImage =
     cover instanceof File && cover.size > 0 ? await saveCover(cover) : undefined
 
+  const dateRead = String(formData.get('dateRead') ?? '')
+  const year = Number(dateRead.split('-')[0])
+
   return {
     title: String(formData.get('title') ?? ''),
     author: String(formData.get('author') ?? ''),
@@ -44,7 +47,7 @@ async function parseForm(formData: FormData): Promise<BookInput> {
     rating: Number(formData.get('rating') ?? 0),
     thoughts: String(formData.get('thoughts') ?? ''),
     quotes,
-    yearRead: Number(formData.get('yearRead') ?? new Date().getFullYear()),
+    yearRead: Number.isFinite(year) && year > 0 ? year : new Date().getFullYear(),
     coverImage,
   }
 }
