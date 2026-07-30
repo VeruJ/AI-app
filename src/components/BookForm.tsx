@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import StarRatingInput from './StarRatingInput'
 
 type BookFormValues = {
   title: string
@@ -14,6 +14,7 @@ type BookFormValues = {
   finishedAt: string
   pagesRead: number
   totalPages: number
+  coverImage: string
 }
 
 export default function BookForm({
@@ -25,10 +26,26 @@ export default function BookForm({
   initial?: Partial<BookFormValues>
   submitLabel: string
 }) {
-  const [rating, setRating] = useState(initial?.rating ?? 0)
-
   return (
     <form action={action} className="space-y-4">
+      <div>
+        <label className="block text-sm font-medium">Cover image</label>
+        {initial?.coverImage && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={`/api/uploads/${initial.coverImage}`}
+            alt="Current cover"
+            className="mt-1 h-32 w-auto rounded border border-gray-200"
+          />
+        )}
+        <input
+          name="cover"
+          type="file"
+          accept="image/*"
+          className="mt-1 w-full rounded border border-gray-300 p-2"
+        />
+      </div>
+
       <div>
         <label className="block text-sm font-medium">Title</label>
         <input
@@ -60,11 +77,11 @@ export default function BookForm({
       </div>
 
       <div>
-        <label className="block text-sm font-medium">Year read</label>
+        <label className="block text-sm font-medium">Date read</label>
         <input
-          name="yearRead"
-          type="number"
-          defaultValue={initial?.yearRead ?? new Date().getFullYear()}
+          name="dateRead"
+          type="date"
+          defaultValue={`${initial?.yearRead ?? new Date().getFullYear()}-01-01`}
           required
           className="mt-1 w-full rounded border border-gray-300 p-2"
         />
@@ -115,17 +132,8 @@ export default function BookForm({
       </div>
 
       <div>
-        <label className="block text-sm font-medium">Rating ({rating} / 5)</label>
-        <input
-          name="rating"
-          type="range"
-          min={0}
-          max={5}
-          step={0.5}
-          value={rating}
-          onChange={(e) => setRating(Number(e.target.value))}
-          className="mt-1 w-full"
-        />
+        <label className="mb-1 block text-sm font-medium">Rating</label>
+        <StarRatingInput name="rating" defaultValue={initial?.rating ?? 0} />
       </div>
 
       <div>

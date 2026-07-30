@@ -15,6 +15,7 @@ export type Book = {
   finishedAt?: string
   pagesRead?: number
   totalPages?: number
+  coverImage?: string
 }
 
 export type BookInput = {
@@ -29,6 +30,7 @@ export type BookInput = {
   finishedAt?: string
   pagesRead?: number
   totalPages?: number
+  coverImage?: string
 }
 
 type Data = { books: Book[] }
@@ -84,7 +86,8 @@ export function updateBook(id: number, input: BookInput): Promise<boolean> {
   return update((data) => {
     const book = data.books.find((b) => b.id === id)
     if (!book) return false
-    Object.assign(book, input)
+    // Keep the existing cover unless a new one was uploaded.
+    Object.assign(book, input, { coverImage: input.coverImage ?? book.coverImage })
     return true
   })
 }

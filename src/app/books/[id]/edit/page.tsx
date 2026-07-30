@@ -32,6 +32,7 @@ export default async function EditBookPage({
           finishedAt: book.finishedAt ?? '',
           pagesRead: book.pagesRead,
           totalPages: book.totalPages,
+          coverImage: book.coverImage ?? '',
         }}
       />
     </main>

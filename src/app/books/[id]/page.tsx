@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import { getBook } from '@/lib/data'
 import { removeBook } from '@/app/actions'
 import StarRating from '@/components/StarRating'
+import DeleteBookButton from '@/components/DeleteBookButton'
 
 export const dynamic = 'force-dynamic'
 
@@ -21,12 +22,22 @@ export default async function BookPage({
         ← Back to your books
       </Link>
 
-      <div className="mt-4 flex items-start justify-between">
-        <div>
-          <h1 className="text-2xl font-bold">{book.title}</h1>
-          <p className="text-gray-500">
-            {book.author} · {book.yearRead}
-          </p>
+      <div className="mt-4 flex items-start justify-between gap-4">
+        <div className="flex items-start gap-4">
+          {book.coverImage && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={`/api/uploads/${book.coverImage}`}
+              alt={`Cover of ${book.title}`}
+              className="h-24 w-auto rounded border border-gray-200"
+            />
+          )}
+          <div>
+            <h1 className="text-2xl font-bold">{book.title}</h1>
+            <p className="text-gray-500">
+              {book.author} · {book.yearRead}
+            </p>
+          </div>
         </div>
         <StarRating rating={book.rating} />
       </div>
@@ -103,14 +114,7 @@ export default async function BookPage({
         >
           Edit
         </Link>
-        <form action={removeBook.bind(null, book.id)}>
-          <button
-            type="submit"
-            className="rounded border border-red-300 px-4 py-2 text-red-600 hover:bg-red-50"
-          >
-            Delete
-          </button>
-        </form>
+        <DeleteBookButton action={removeBook.bind(null, book.id)} />
       </div>
     </main>
   )
