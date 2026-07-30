@@ -3,6 +3,7 @@ import { notFound } from 'next/navigation'
 import { getBook } from '@/lib/data'
 import { removeBook } from '@/app/actions'
 import StarRating from '@/components/StarRating'
+import DeleteBookButton from '@/components/DeleteBookButton'
 
 export const dynamic = 'force-dynamic'
 
@@ -74,14 +75,7 @@ export default async function BookPage({
         >
           Edit
         </Link>
-        <form action={removeBook.bind(null, book.id)}>
-          <button
-            type="submit"
-            className="rounded border border-red-300 px-4 py-2 text-red-600 hover:bg-red-50"
-          >
-            Delete
-          </button>
-        </form>
+        <DeleteBookButton action={removeBook.bind(null, book.id)} />
       </div>
     </main>
   )
