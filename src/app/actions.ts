@@ -14,6 +14,9 @@ function parseForm(formData: FormData): BookInput {
     .map((q) => q.trim())
     .filter(Boolean)
 
+  const dateRead = String(formData.get('dateRead') ?? '')
+  const year = Number(dateRead.split('-')[0])
+
   return {
     title: String(formData.get('title') ?? ''),
     author: String(formData.get('author') ?? ''),
@@ -21,7 +24,7 @@ function parseForm(formData: FormData): BookInput {
     rating: Number(formData.get('rating') ?? 0),
     thoughts: String(formData.get('thoughts') ?? ''),
     quotes,
-    yearRead: Number(formData.get('yearRead') ?? new Date().getFullYear()),
+    yearRead: Number.isFinite(year) && year > 0 ? year : new Date().getFullYear(),
   }
 }
 
