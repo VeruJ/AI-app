@@ -1,5 +1,5 @@
 import Link from 'next/link'
-import { listBooks } from '@/lib/data'
+import { listBooks, FORMAT_LABELS, type BookFormat } from '@/lib/data'
 import { yearOf } from '@/lib/dates'
 import BookListItem from '@/components/BookListItem'
 
@@ -7,11 +7,16 @@ export const dynamic = 'force-dynamic'
 
 const UNSCHEDULED = 'unscheduled' as const
 
-function tabHref(params: { q: string; genre: string; minRating: string }, tab: string) {
+function toArray(value: string | string[] | undefined): string[] {
+  if (!value) return []
+  return Array.isArray(value) ? value : [value]
+}
+
+function tabHref(params: { q: string; genres: string[]; format: string }, tab: string) {
   const query = new URLSearchParams()
   if (params.q) query.set('q', params.q)
-  if (params.genre) query.set('genre', params.genre)
-  if (params.minRating) query.set('minRating', params.minRating)
+  for (const g of params.genres) query.append('genres', g)
+  if (params.format) query.set('format', params.format)
   query.set('tab', tab)
   return `/?${query.toString()}`
 }
@@ -19,11 +24,12 @@ function tabHref(params: { q: string; genre: string; minRating: string }, tab: s
 export default async function HomePage({
   searchParams,
 }: {
-  searchParams: Promise<{ q?: string; genre?: string; minRating?: string; tab?: string }>
+  searchParams: Promise<{ q?: string; genres?: string | string[]; format?: string; tab?: string }>
 }) {
-  const { q = '', genre = '', minRating = '', tab = 'library' } = await searchParams
+  const { q = '', genres: genresParam, format = '', tab = 'library' } = await searchParams
+  const selectedGenres = toArray(genresParam)
   const isTbrTab = tab === 'tbr'
-  const params = { q, genre, minRating }
+  const params = { q, genres: selectedGenres, format }
   const books = await listBooks()
 
   const allGenres = [...new Set(books.flatMap((b) => b.genres))].sort()
@@ -34,9 +40,9 @@ export default async function HomePage({
       !query ||
       book.title.toLowerCase().includes(query) ||
       book.author.toLowerCase().includes(query)
-    const matchesGenre = !genre || book.genres.includes(genre)
-    const matchesRating = !minRating || book.rating >= Number(minRating)
-    return matchesQuery && matchesGenre && matchesRating
+    const matchesGenres = selectedGenres.every((g) => book.genres.includes(g))
+    const matchesFormat = !format || book.format === format
+    return matchesQuery && matchesGenres && matchesFormat
   })
 
   const toBeRead = filtered.filter((b) => b.status === 'tbr' && !b.finishedAt)
@@ -57,7 +63,7 @@ export default async function HomePage({
     return b - a
   })
 
-  const isFiltering = Boolean(q || genre || minRating)
+  const isFiltering = Boolean(q || selectedGenres.length || format)
   const tabIsEmpty = isTbrTab ? toBeRead.length === 0 : currentReads.length === 0 && years.length === 0
 
   return (
@@ -110,51 +116,57 @@ export default async function HomePage({
       )}
 
       {books.length > 0 && (
-        <form method="GET" className="mb-6 flex flex-wrap gap-2">
+        <form method="GET" className="mb-6 flex flex-col gap-3">
           <input type="hidden" name="tab" value={tab} />
-          <input
-            name="q"
-            defaultValue={q}
-            placeholder="Search title or author"
-            className="min-w-[10rem] flex-1 rounded border border-gray-300 p-2"
-          />
-          <select
-            name="genre"
-            defaultValue={genre}
-            className="rounded border border-gray-300 p-2"
-          >
-            <option value="">All genres</option>
-            {allGenres.map((g) => (
-              <option key={g} value={g}>
-                {g}
-              </option>
-            ))}
-          </select>
-          <select
-            name="minRating"
-            defaultValue={minRating}
-            className="rounded border border-gray-300 p-2"
-          >
-            <option value="">Any rating</option>
-            {[1, 2, 3, 4, 5].map((r) => (
-              <option key={r} value={r}>
-                {r}+ stars
-              </option>
-            ))}
-          </select>
-          <button
-            type="submit"
-            className="rounded border border-gray-300 px-4 py-2 hover:bg-gray-50"
-          >
-            Filter
-          </button>
-          {isFiltering && (
-            <Link
-              href={tabHref({ q: '', genre: '', minRating: '' }, tab)}
+          <div className="flex flex-wrap gap-2">
+            <input
+              name="q"
+              defaultValue={q}
+              placeholder="Search title or author"
+              className="min-w-[10rem] flex-1 rounded border border-gray-300 p-2"
+            />
+            <select
+              name="format"
+              defaultValue={format}
+              className="rounded border border-gray-300 p-2"
+            >
+              <option value="">All types</option>
+              {(Object.keys(FORMAT_LABELS) as BookFormat[]).map((f) => (
+                <option key={f} value={f}>
+                  {FORMAT_LABELS[f]}
+                </option>
+              ))}
+            </select>
+            <button
+              type="submit"
               className="rounded border border-gray-300 px-4 py-2 hover:bg-gray-50"
             >
-              Clear
-            </Link>
+              Filter
+            </button>
+            {isFiltering && (
+              <Link
+                href={tabHref({ q: '', genres: [], format: '' }, tab)}
+                className="rounded border border-gray-300 px-4 py-2 hover:bg-gray-50"
+              >
+                Clear
+              </Link>
+            )}
+          </div>
+          {allGenres.length > 0 && (
+            <div className="flex flex-wrap gap-3">
+              {allGenres.map((g) => (
+                <label key={g} className="flex items-center gap-1 text-sm text-gray-700">
+                  <input
+                    type="checkbox"
+                    name="genres"
+                    value={g}
+                    defaultChecked={selectedGenres.includes(g)}
+                    className="rounded border-gray-300"
+                  />
+                  {g}
+                </label>
+              ))}
+            </div>
           )}
         </form>
       )}

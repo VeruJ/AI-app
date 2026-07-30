@@ -4,7 +4,7 @@ import { writeFile, mkdir } from 'node:fs/promises'
 import path from 'node:path'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { addBook, updateBook, deleteBook, type BookInput, type BookStatus } from '@/lib/data'
+import { addBook, updateBook, deleteBook, type BookInput, type BookStatus, type BookFormat } from '@/lib/data'
 import { yearOf } from '@/lib/dates'
 
 const MAX_COVER_SIZE = 5_000_000
@@ -51,6 +51,10 @@ async function parseForm(formData: FormData): Promise<BookInput> {
   const status: BookStatus =
     statusRaw === 'reading' || statusRaw === 'read' ? statusRaw : 'tbr'
 
+  const formatRaw = String(formData.get('format') ?? '')
+  const format: BookFormat =
+    formatRaw === 'ebook' || formatRaw === 'audio' ? formatRaw : 'physical'
+
   const rating = Math.max(0, Math.min(5, Number(formData.get('rating') ?? 0)))
 
   return {
@@ -58,6 +62,7 @@ async function parseForm(formData: FormData): Promise<BookInput> {
     author: String(formData.get('author') ?? '').trim(),
     genres,
     status,
+    format,
     rating,
     thoughts: String(formData.get('thoughts') ?? ''),
     quotes,

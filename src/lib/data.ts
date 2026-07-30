@@ -4,6 +4,9 @@ import path from 'node:path'
 export type { BookStatus } from './bookStatus'
 export { STATUS_LABELS } from './bookStatus'
 import type { BookStatus } from './bookStatus'
+export type { BookFormat } from './bookFormat'
+export { FORMAT_LABELS } from './bookFormat'
+import type { BookFormat } from './bookFormat'
 
 export type Book = {
   id: number
@@ -11,6 +14,7 @@ export type Book = {
   author: string
   genres: string[]
   status: BookStatus
+  format: BookFormat
   rating: number
   thoughts: string
   quotes: string[]
@@ -28,6 +32,7 @@ export type BookInput = {
   author: string
   genres: string[]
   status?: BookStatus
+  format?: BookFormat
   rating: number
   thoughts: string
   quotes: string[]
@@ -49,7 +54,12 @@ async function readAll(): Promise<Data> {
     const data = JSON.parse(await readFile(FILE, 'utf8')) as Data
     // Older records predate the status field. They already carry a rating and
     // year read, so treat them as finished books rather than leaving them undefined.
-    data.books = data.books.map((b) => ({ ...b, status: b.status ?? 'read' }))
+    // Records predating the format field default to physical, the assumption that held before e-books/audio were tracked.
+    data.books = data.books.map((b) => ({
+      ...b,
+      status: b.status ?? 'read',
+      format: b.format ?? 'physical',
+    }))
     return data
   } catch {
     return structuredClone(EMPTY)
@@ -89,6 +99,7 @@ export function addBook(input: BookInput): Promise<number> {
     const id = Math.max(0, ...data.books.map((b) => b.id)) + 1
     data.books.push({
       status: 'tbr',
+      format: 'physical',
       ...input,
       id,
       createdAt: new Date().toISOString(),

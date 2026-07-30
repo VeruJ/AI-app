@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { getBook, STATUS_LABELS } from '@/lib/data'
+import { getBook, STATUS_LABELS, FORMAT_LABELS } from '@/lib/data'
+import { formatDateCz } from '@/lib/dates'
 import { removeBook } from '@/app/actions'
 import StarRating from '@/components/StarRating'
 import DeleteBookButton from '@/components/DeleteBookButton'
@@ -22,28 +23,34 @@ export default async function BookPage({
         ← Back to your books
       </Link>
 
-      <div className="mt-4 flex items-start justify-between gap-4">
-        <div className="flex items-start gap-4">
-          {book.coverImage && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
-              src={`/api/uploads/${book.coverImage}`}
-              alt={`Cover of ${book.title || 'book'}`}
-              className="h-24 w-auto rounded border border-gray-200"
-            />
-          )}
-          <div>
-            <h1 className="text-2xl font-bold">{book.title || 'Untitled'}</h1>
-            <p className="text-gray-500">
-              {book.author || 'Unknown author'}
-              {book.yearRead ? ` · ${book.yearRead}` : ''}
-            </p>
-          </div>
-        </div>
+      <div className="mt-4 flex items-end justify-between gap-4">
+        {book.coverImage ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img
+            src={`/api/uploads/${book.coverImage}`}
+            alt={`Cover of ${book.title || 'book'}`}
+            className="h-24 w-auto rounded border border-gray-200"
+          />
+        ) : (
+          <span />
+        )}
         <div className="flex flex-col items-end gap-2">
           <span className="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-600">
             {STATUS_LABELS[book.status]}
           </span>
+          <span className="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-600">
+            {FORMAT_LABELS[book.format]}
+          </span>
+        </div>
+      </div>
+
+      <div className="mt-3">
+        <h1 className="text-2xl font-bold">{book.title || 'Untitled'}</h1>
+        <p className="text-gray-500">
+          {book.author || 'Unknown author'}
+          {book.yearRead ? ` · ${book.yearRead}` : ''}
+        </p>
+        <div className="mt-2">
           <StarRating rating={book.rating} />
         </div>
       </div>
@@ -61,32 +68,13 @@ export default async function BookPage({
         </div>
       )}
 
-      {(book.startedAt || book.finishedAt || book.pagesRead || book.totalPages) && (
+      {(book.startedAt || book.finishedAt) && (
         <section className="mt-6">
           <h2 className="mb-2 text-lg font-semibold">Reading progress</h2>
-          {(book.startedAt || book.finishedAt) && (
-            <p className="text-gray-700">
-              {book.startedAt ? `Started ${book.startedAt}` : 'Start date not set'}
-              {book.finishedAt ? ` · Finished ${book.finishedAt}` : ''}
-            </p>
-          )}
-          {(book.pagesRead || book.totalPages) && (
-            <div className="mt-2">
-              <p className="text-sm text-gray-500">
-                {book.pagesRead ?? 0} / {book.totalPages ?? '?'} pages
-              </p>
-              {book.totalPages ? (
-                <div className="mt-1 h-2 w-full rounded bg-gray-100">
-                  <div
-                    className="h-2 rounded bg-indigo-600"
-                    style={{
-                      width: `${Math.min(100, ((book.pagesRead ?? 0) / book.totalPages) * 100)}%`,
-                    }}
-                  />
-                </div>
-              ) : null}
-            </div>
-          )}
+          <p className="text-gray-700">
+            {book.startedAt ? `Started ${formatDateCz(book.startedAt)}` : 'Start date not set'}
+            {book.finishedAt ? ` · Finished ${formatDateCz(book.finishedAt)}` : ''}
+          </p>
         </section>
       )}
 

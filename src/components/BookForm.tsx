@@ -2,12 +2,14 @@
 
 import StarRatingInput from './StarRatingInput'
 import { STATUS_LABELS, type BookStatus } from '@/lib/bookStatus'
+import { FORMAT_LABELS, type BookFormat } from '@/lib/bookFormat'
 
 type BookFormValues = {
   title: string
   author: string
   genres: string
   status: BookStatus
+  format: BookFormat
   rating: number
   thoughts: string
   quotes: string
@@ -65,19 +67,35 @@ export default function BookForm({
         />
       </div>
 
-      <div>
-        <label className="block text-sm font-medium">Status</label>
-        <select
-          name="status"
-          defaultValue={initial?.status ?? 'tbr'}
-          className="mt-1 w-full rounded border border-gray-300 p-2"
-        >
-          {Object.entries(STATUS_LABELS).map(([value, label]) => (
-            <option key={value} value={value}>
-              {label}
-            </option>
-          ))}
-        </select>
+      <div className="flex gap-4">
+        <div className="flex-1">
+          <label className="block text-sm font-medium">Status</label>
+          <select
+            name="status"
+            defaultValue={initial?.status ?? 'tbr'}
+            className="mt-1 w-full rounded border border-gray-300 p-2"
+          >
+            {Object.entries(STATUS_LABELS).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </div>
+        <div className="flex-1">
+          <label className="block text-sm font-medium">Type</label>
+          <select
+            name="format"
+            defaultValue={initial?.format ?? 'physical'}
+            className="mt-1 w-full rounded border border-gray-300 p-2"
+          >
+            {Object.entries(FORMAT_LABELS).map(([value, label]) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </div>
       </div>
 
       <div>
