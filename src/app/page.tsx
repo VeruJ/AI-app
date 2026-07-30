@@ -4,16 +4,36 @@ import StarRating from '@/components/StarRating'
 
 export const dynamic = 'force-dynamic'
 
-export default async function HomePage() {
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ q?: string; genre?: string; minRating?: string }>
+}) {
+  const { q = '', genre = '', minRating = '' } = await searchParams
   const books = await listBooks()
 
-  const byYear = new Map<number, typeof books>()
-  for (const book of books) {
+  const allGenres = [...new Set(books.flatMap((b) => b.genres))].sort()
+
+  const query = q.trim().toLowerCase()
+  const filtered = books.filter((book) => {
+    const matchesQuery =
+      !query ||
+      book.title.toLowerCase().includes(query) ||
+      book.author.toLowerCase().includes(query)
+    const matchesGenre = !genre || book.genres.includes(genre)
+    const matchesRating = !minRating || book.rating >= Number(minRating)
+    return matchesQuery && matchesGenre && matchesRating
+  })
+
+  const byYear = new Map<number, typeof filtered>()
+  for (const book of filtered) {
     const list = byYear.get(book.yearRead) ?? []
     list.push(book)
     byYear.set(book.yearRead, list)
   }
   const years = [...byYear.keys()].sort((a, b) => b - a)
+
+  const isFiltering = Boolean(q || genre || minRating)
 
   return (
     <main className="mx-auto max-w-2xl p-6">
@@ -29,6 +49,59 @@ export default async function HomePage() {
 
       {books.length === 0 && (
         <p className="text-gray-500">No books yet — add the first one you&apos;ve read.</p>
+      )}
+
+      {books.length > 0 && (
+        <form method="GET" className="mb-6 flex flex-wrap gap-2">
+          <input
+            name="q"
+            defaultValue={q}
+            placeholder="Search title or author"
+            className="min-w-[10rem] flex-1 rounded border border-gray-300 p-2"
+          />
+          <select
+            name="genre"
+            defaultValue={genre}
+            className="rounded border border-gray-300 p-2"
+          >
+            <option value="">All genres</option>
+            {allGenres.map((g) => (
+              <option key={g} value={g}>
+                {g}
+              </option>
+            ))}
+          </select>
+          <select
+            name="minRating"
+            defaultValue={minRating}
+            className="rounded border border-gray-300 p-2"
+          >
+            <option value="">Any rating</option>
+            {[1, 2, 3, 4, 5].map((r) => (
+              <option key={r} value={r}>
+                {r}+ stars
+              </option>
+            ))}
+          </select>
+          <button
+            type="submit"
+            className="rounded border border-gray-300 px-4 py-2 hover:bg-gray-50"
+          >
+            Filter
+          </button>
+          {isFiltering && (
+            <Link
+              href="/"
+              className="rounded border border-gray-300 px-4 py-2 hover:bg-gray-50"
+            >
+              Clear
+            </Link>
+          )}
+        </form>
+      )}
+
+      {books.length > 0 && filtered.length === 0 && (
+        <p className="text-gray-500">No books match those filters.</p>
       )}
 
       {years.map((year) => (
