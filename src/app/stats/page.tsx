@@ -23,7 +23,9 @@ export default async function StatsPage() {
   }
   const years = [...byYear.keys()].sort((a, b) => b - a)
 
-  const booksRead = books.filter((b) => b.status === 'read').length
+  const readBooks = books.filter((b) => b.status === 'read')
+  const booksRead = readBooks.length
+  const totalPagesRead = readBooks.reduce((sum, b) => sum + (b.totalPages ?? 0), 0)
 
   const avgRating = books.length
     ? books.reduce((sum, b) => sum + b.rating, 0) / books.length
@@ -56,6 +58,10 @@ export default async function StatsPage() {
             <div>
               <p className="text-sm text-gray-500">Books read</p>
               <p className="text-3xl font-semibold">{booksRead}</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-500">Total pages</p>
+              <p className="text-3xl font-semibold">{totalPagesRead.toLocaleString()}</p>
             </div>
             <div>
               <p className="text-sm text-gray-500">Average rating</p>
