@@ -7,7 +7,7 @@ export default function BookListItem({ book }: { book: Book }) {
     <li>
       <Link
         href={`/books/${book.id}`}
-        className="flex items-center justify-between rounded border border-gray-200 bg-white p-3 hover:bg-gray-50"
+        className="flex items-center justify-between rounded border border-stone-200 bg-white p-3 hover:bg-stone-50"
       >
         <div className="flex flex-1 items-center justify-between gap-3">
           <div className="flex items-center gap-3">
@@ -16,20 +16,20 @@ export default function BookListItem({ book }: { book: Book }) {
               <img
                 src={`/api/uploads/${book.coverImage}`}
                 alt={`Cover of ${book.title || 'book'}`}
-                className="h-12 w-auto rounded border border-gray-200"
+                className="h-12 w-auto rounded border border-stone-200"
               />
             )}
             <div>
               <p className="font-medium">{book.title || 'Untitled'}</p>
-              <p className="text-sm text-gray-500">{book.author || 'Unknown author'}</p>
+              <p className="text-sm text-stone-500">{book.author || 'Unknown author'}</p>
             </div>
           </div>
-          <span className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600">
+          <span className="rounded-full bg-stone-100 px-2 py-0.5 text-xs text-stone-600">
             {STATUS_LABELS[book.status]}
           </span>
         </div>
         <div className="flex items-center gap-2 pl-4">
-          {book.rating === 0 && <span className="text-sm text-gray-500">Not rated</span>}
+          {book.rating === 0 && <span className="text-sm text-stone-500">Not rated</span>}
           <StarRating rating={book.rating} />
         </div>
       </Link>

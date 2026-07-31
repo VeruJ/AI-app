@@ -37,14 +37,14 @@ export default function BookForm({
           <img
             src={`/api/uploads/${initial.coverImage}`}
             alt="Current cover"
-            className="mt-1 h-32 w-auto rounded border border-gray-200"
+            className="mt-1 h-32 w-auto rounded border border-stone-200"
           />
         )}
         <input
           name="cover"
           type="file"
           accept="image/*"
-          className="mt-1 w-full rounded border border-gray-300 p-2"
+          className="mt-1 w-full rounded border border-stone-300 p-2"
         />
       </div>
 
@@ -53,7 +53,7 @@ export default function BookForm({
         <input
           name="title"
           defaultValue={initial?.title}
-          className="mt-1 w-full rounded border border-gray-300 p-2"
+          className="mt-1 w-full rounded border border-stone-300 p-2"
         />
       </div>
 
@@ -62,7 +62,7 @@ export default function BookForm({
         <input
           name="author"
           defaultValue={initial?.author}
-          className="mt-1 w-full rounded border border-gray-300 p-2"
+          className="mt-1 w-full rounded border border-stone-300 p-2"
         />
       </div>
 
@@ -72,7 +72,7 @@ export default function BookForm({
           <select
             name="status"
             defaultValue={initial?.status ?? 'tbr'}
-            className="mt-1 w-full rounded border border-gray-300 p-2"
+            className="mt-1 w-full rounded border border-stone-300 p-2"
           >
             {Object.entries(STATUS_LABELS).map(([value, label]) => (
               <option key={value} value={value}>
@@ -86,7 +86,7 @@ export default function BookForm({
           <select
             name="format"
             defaultValue={initial?.format ?? 'physical'}
-            className="mt-1 w-full rounded border border-gray-300 p-2"
+            className="mt-1 w-full rounded border border-stone-300 p-2"
           >
             {Object.entries(FORMAT_LABELS).map(([value, label]) => (
               <option key={value} value={value}>
@@ -103,7 +103,7 @@ export default function BookForm({
           name="genres"
           defaultValue={initial?.genres}
           placeholder="fantasy, classic"
-          className="mt-1 w-full rounded border border-gray-300 p-2"
+          className="mt-1 w-full rounded border border-stone-300 p-2"
         />
       </div>
 
@@ -114,7 +114,7 @@ export default function BookForm({
             name="startedAt"
             type="date"
             defaultValue={initial?.startedAt}
-            className="mt-1 w-full rounded border border-gray-300 p-2"
+            className="mt-1 w-full rounded border border-stone-300 p-2"
           />
         </div>
         <div className="flex-1">
@@ -123,7 +123,7 @@ export default function BookForm({
             name="finishedAt"
             type="date"
             defaultValue={initial?.finishedAt}
-            className="mt-1 w-full rounded border border-gray-300 p-2"
+            className="mt-1 w-full rounded border border-stone-300 p-2"
           />
         </div>
       </div>
@@ -135,7 +135,7 @@ export default function BookForm({
           type="number"
           min={0}
           defaultValue={initial?.totalPages}
-          className="mt-1 w-full rounded border border-gray-300 p-2"
+          className="mt-1 w-full rounded border border-stone-300 p-2"
         />
       </div>
 
@@ -150,7 +150,7 @@ export default function BookForm({
           name="thoughts"
           defaultValue={initial?.thoughts}
           rows={4}
-          className="mt-1 w-full rounded border border-gray-300 p-2"
+          className="mt-1 w-full rounded border border-stone-300 p-2"
         />
       </div>
 
@@ -160,13 +160,13 @@ export default function BookForm({
           name="quotes"
           defaultValue={initial?.quotes}
           rows={4}
-          className="mt-1 w-full rounded border border-gray-300 p-2"
+          className="mt-1 w-full rounded border border-stone-300 p-2"
         />
       </div>
 
       <button
         type="submit"
-        className="rounded bg-indigo-600 px-4 py-2 text-white hover:bg-indigo-700"
+        className="rounded bg-amber-800 px-4 py-2 text-white hover:bg-amber-900"
       >
         {submitLabel}
       </button>

@@ -23,7 +23,7 @@ export default function StarRatingInput({
         className="relative inline-block text-2xl leading-none"
         onMouseLeave={() => setHover(null)}
       >
-        <span className="text-gray-300">★★★★★</span>
+        <span className="text-stone-300">★★★★★</span>
         <span
           className="absolute left-0 top-0 overflow-hidden whitespace-nowrap text-yellow-500"
           style={{ width: `${percent}%` }}
@@ -43,7 +43,7 @@ export default function StarRatingInput({
           ))}
         </div>
       </div>
-      <span className="text-sm text-gray-500">
+      <span className="text-sm text-stone-500">
         {display > 0 ? `${display} / 5` : 'Not rated'}
       </span>
     </div>

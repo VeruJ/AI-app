@@ -41,38 +41,38 @@ export default async function StatsPage() {
 
   return (
     <main className="mx-auto max-w-2xl p-6">
-      <Link href="/" className="text-sm text-indigo-600 hover:underline">
+      <Link href="/" className="text-sm text-amber-800 hover:underline">
         ← Back to your books
       </Link>
-      <h1 className="mb-6 mt-4 text-2xl font-bold">Stats</h1>
+      <h1 className="font-heading mb-6 mt-4 text-2xl font-bold">Stats</h1>
 
       {books.length === 0 ? (
-        <p className="text-gray-500">No books yet — add some to see stats.</p>
+        <p className="text-stone-500">No books yet — add some to see stats.</p>
       ) : (
         <>
           <section className="mb-6 flex gap-6">
             <div>
-              <p className="text-sm text-gray-500">Books tracked</p>
+              <p className="text-sm text-stone-500">Books tracked</p>
               <p className="text-3xl font-semibold">{books.length}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">Books read</p>
+              <p className="text-sm text-stone-500">Books read</p>
               <p className="text-3xl font-semibold">{booksRead}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">Total pages</p>
+              <p className="text-sm text-stone-500">Total pages</p>
               <p className="text-3xl font-semibold">{totalPagesRead.toLocaleString()}</p>
             </div>
             <div>
-              <p className="text-sm text-gray-500">Average rating</p>
+              <p className="text-sm text-stone-500">Average rating</p>
               <p className="text-3xl font-semibold">{avgRating.toFixed(1)} / 5</p>
             </div>
           </section>
 
           <section className="mb-6">
-            <h2 className="mb-2 text-lg font-semibold">Books per year</h2>
+            <h2 className="font-heading mb-2 text-lg font-semibold">Books per year</h2>
             {years.length === 0 ? (
-              <p className="text-gray-500">No books with a year read yet.</p>
+              <p className="text-stone-500">No books with a year read yet.</p>
             ) : (
               <div className="space-y-4">
                 {years.map((year) => {
@@ -80,7 +80,7 @@ export default async function StatsPage() {
                   const totalPages = yearBooks.reduce((sum, b) => sum + (b.totalPages ?? 0), 0)
                   return (
                     <div key={year}>
-                      <p className="mb-2 text-sm font-medium text-gray-600">
+                      <p className="mb-2 text-sm font-medium text-stone-600">
                         {year} · {yearBooks.length} book{yearBooks.length === 1 ? '' : 's'}
                         {totalPages > 0 ? ` · ${totalPages.toLocaleString()} pages` : ''}
                       </p>
@@ -96,10 +96,10 @@ export default async function StatsPage() {
                               <img
                                 src={`/api/uploads/${book.coverImage}`}
                                 alt={`Cover of ${book.title || 'book'}`}
-                                className="h-24 w-16 rounded border border-gray-200 object-cover"
+                                className="h-24 w-16 rounded border border-stone-200 object-cover"
                               />
                             ) : (
-                              <div className="flex h-24 w-16 items-center justify-center rounded border border-gray-200 bg-gray-100 p-1 text-center text-[10px] text-gray-500">
+                              <div className="flex h-24 w-16 items-center justify-center rounded border border-stone-200 bg-stone-100 p-1 text-center text-[10px] text-stone-500">
                                 {book.title || 'Untitled'}
                               </div>
                             )}
@@ -114,9 +114,9 @@ export default async function StatsPage() {
           </section>
 
           <section>
-            <h2 className="mb-2 text-lg font-semibold">Genres</h2>
+            <h2 className="font-heading mb-2 text-lg font-semibold">Genres</h2>
             {genres.length === 0 ? (
-              <p className="text-gray-500">No genre tags yet.</p>
+              <p className="text-stone-500">No genre tags yet.</p>
             ) : (
               <HorizontalBars
                 items={genres.map(([genre, count]) => ({
