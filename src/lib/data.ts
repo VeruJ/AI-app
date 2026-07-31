@@ -25,6 +25,7 @@ export type Book = {
   pagesRead?: number
   totalPages?: number
   coverImage?: string
+  images?: string[]
 }
 
 export type BookInput = {
@@ -124,5 +125,35 @@ export function deleteBook(id: number): Promise<boolean> {
     if (index === -1) return false
     data.books.splice(index, 1)
     return true
+  })
+}
+
+export function addBookImages(id: number, filenames: string[]): Promise<boolean> {
+  return update((data) => {
+    const book = data.books.find((b) => b.id === id)
+    if (!book) return false
+    book.images = [...(book.images ?? []), ...filenames]
+    return true
+  })
+}
+
+export function deleteBookImage(id: number, filename: string): Promise<boolean> {
+  return update((data) => {
+    const book = data.books.find((b) => b.id === id)
+    if (!book) return false
+    book.images = (book.images ?? []).filter((f) => f !== filename)
+    return true
+  })
+}
+
+export function reorderBookImages(id: number, order: string[]): Promise<boolean> {
+  return update((data) => {
+    const book = data.books.find((b) => b.id === id)
+    if (!book) return false
+    const current = book.images ?? []
+    const isValidPermutation =
+      order.length === current.length && order.every((f) => current.includes(f))
+    if (isValidPermutation) book.images = order
+    return isValidPermutation
   })
 }

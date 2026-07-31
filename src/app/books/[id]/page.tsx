@@ -2,9 +2,10 @@ import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import { getBook, STATUS_LABELS, FORMAT_LABELS } from '@/lib/data'
 import { formatDateCz } from '@/lib/dates'
-import { removeBook } from '@/app/actions'
+import { removeBook, uploadBookImages, removeBookImage, reorderBookImages } from '@/app/actions'
 import StarRating from '@/components/StarRating'
 import DeleteBookButton from '@/components/DeleteBookButton'
+import VisionBoard from '@/components/VisionBoard'
 
 export const dynamic = 'force-dynamic'
 
@@ -109,6 +110,16 @@ export default async function BookPage({
         </Link>
         <DeleteBookButton action={removeBook.bind(null, book.id)} />
       </div>
+
+      <section className="mt-8">
+        <h2 className="mb-3 text-lg font-semibold">Vision board</h2>
+        <VisionBoard
+          initialImages={book.images ?? []}
+          uploadAction={uploadBookImages.bind(null, book.id)}
+          removeAction={removeBookImage.bind(null, book.id)}
+          reorderAction={reorderBookImages.bind(null, book.id)}
+        />
+      </section>
     </main>
   )
 }
