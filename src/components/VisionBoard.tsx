@@ -51,6 +51,7 @@ export default function VisionBoard({
 
   async function handleRemove(filename: string) {
     setImages((prev) => prev.filter((f) => f !== filename))
+    setOpenIndex(null)
     await removeAction(filename)
   }
 
@@ -66,7 +67,36 @@ export default function VisionBoard({
 
   return (
     <div>
-      <div className="mb-4">
+      {images.length === 0 ? (
+        <p className="mb-4 text-gray-500">No images yet — add a few to build your board.</p>
+      ) : (
+        <div className="mb-4 flex flex-wrap gap-2">
+          {images.map((file, index) => (
+            <div
+              key={file}
+              draggable
+              onDragStart={(e) => {
+                e.dataTransfer.effectAllowed = 'move'
+                e.dataTransfer.setData('text/plain', String(index))
+                setDragIndex(index)
+              }}
+              onDragOver={(e) => e.preventDefault()}
+              onDrop={() => handleDrop(index)}
+              className="relative cursor-grab overflow-hidden rounded border border-gray-200"
+            >
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src={`/api/uploads/${file}`}
+                alt="Vision board"
+                className="block h-40 w-auto"
+                onClick={() => setOpenIndex(index)}
+              />
+            </div>
+          ))}
+        </div>
+      )}
+
+      <div>
         <input
           ref={fileInputRef}
           type="file"
@@ -85,43 +115,6 @@ export default function VisionBoard({
         </button>
       </div>
 
-      {images.length === 0 ? (
-        <p className="text-gray-500">No images yet — add a few to build your board.</p>
-      ) : (
-        <div className="flex flex-wrap gap-2">
-          {images.map((file, index) => (
-            <div
-              key={file}
-              draggable
-              onDragStart={(e) => {
-                e.dataTransfer.effectAllowed = 'move'
-                e.dataTransfer.setData('text/plain', String(index))
-                setDragIndex(index)
-              }}
-              onDragOver={(e) => e.preventDefault()}
-              onDrop={() => handleDrop(index)}
-              className="group relative cursor-grab overflow-hidden rounded border border-gray-200"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src={`/api/uploads/${file}`}
-                alt="Vision board"
-                className="block h-40 w-auto"
-                onClick={() => setOpenIndex(index)}
-              />
-              <button
-                type="button"
-                onClick={() => handleRemove(file)}
-                aria-label="Remove image"
-                className="absolute right-1 top-1 flex h-6 w-6 items-center justify-center rounded-full bg-black/60 text-white"
-              >
-                ×
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
-
       {openIndex !== null && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-6"
@@ -134,6 +127,17 @@ export default function VisionBoard({
             className="absolute right-6 top-6 text-3xl text-white"
           >
             ×
+          </button>
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation()
+              handleRemove(images[openIndex])
+            }}
+            aria-label="Delete image"
+            className="absolute left-6 top-6 rounded border border-red-300 px-3 py-1 text-sm text-red-300 hover:bg-red-950"
+          >
+            Delete
           </button>
           {openIndex > 0 && (
             <button
