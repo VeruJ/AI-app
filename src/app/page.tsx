@@ -164,14 +164,16 @@ export default async function HomePage({
             >
               Filter
             </button>
-            {isFiltering && (
-              <Link
-                href={tabHref({ q: '', genres: [], format: '' }, tab)}
-                className="rounded border border-gray-300 px-4 py-2 hover:bg-gray-50"
-              >
-                Clear
-              </Link>
-            )}
+            <Link
+              href={isFiltering ? tabHref({ q: '', genres: [], format: '' }, tab) : '#'}
+              aria-hidden={!isFiltering}
+              tabIndex={isFiltering ? 0 : -1}
+              className={`rounded border border-gray-300 px-4 py-2 hover:bg-gray-50 ${
+                isFiltering ? '' : 'invisible pointer-events-none'
+              }`}
+            >
+              Clear
+            </Link>
           </div>
         </form>
       )}
