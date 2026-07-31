@@ -6,7 +6,8 @@ import HorizontalBars from '@/components/HorizontalBars'
 export const dynamic = 'force-dynamic'
 
 // Sequential: one hue for plain magnitude comparisons (genres).
-const SEQUENTIAL_HUE = '#2a78d6'
+// Matches the amber-800 theme accent used elsewhere in the app.
+const SEQUENTIAL_HUE = '#92400e'
 
 const TOP_GENRES_LIMIT = 5
 
