@@ -137,6 +137,27 @@ export default async function HomePage({
                 </option>
               ))}
             </select>
+            {allGenres.length > 0 && (
+              <details className="relative rounded border border-gray-300">
+                <summary className="cursor-pointer list-none px-4 py-2 text-sm text-gray-700">
+                  Genres{selectedGenres.length > 0 ? ` (${selectedGenres.length})` : ''}
+                </summary>
+                <div className="absolute z-10 mt-1 flex flex-col gap-1 rounded border border-gray-300 bg-white p-3 shadow-lg">
+                  {allGenres.map((g) => (
+                    <label key={g} className="flex items-center gap-2 text-sm text-gray-700">
+                      <input
+                        type="checkbox"
+                        name="genres"
+                        value={g}
+                        defaultChecked={selectedGenres.includes(g)}
+                        className="rounded border-gray-300"
+                      />
+                      {g}
+                    </label>
+                  ))}
+                </div>
+              </details>
+            )}
             <button
               type="submit"
               className="rounded border border-gray-300 px-4 py-2 hover:bg-gray-50"
@@ -152,22 +173,6 @@ export default async function HomePage({
               </Link>
             )}
           </div>
-          {allGenres.length > 0 && (
-            <div className="flex flex-wrap gap-3">
-              {allGenres.map((g) => (
-                <label key={g} className="flex items-center gap-1 text-sm text-gray-700">
-                  <input
-                    type="checkbox"
-                    name="genres"
-                    value={g}
-                    defaultChecked={selectedGenres.includes(g)}
-                    className="rounded border-gray-300"
-                  />
-                  {g}
-                </label>
-              ))}
-            </div>
-          )}
         </form>
       )}
 
