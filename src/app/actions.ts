@@ -4,14 +4,24 @@ import { writeFile, mkdir } from 'node:fs/promises'
 import path from 'node:path'
 import { revalidatePath } from 'next/cache'
 import { redirect } from 'next/navigation'
-import { addBook, updateBook, deleteBook, type BookInput, type BookStatus, type BookFormat } from '@/lib/data'
+import {
+  addBook,
+  updateBook,
+  deleteBook,
+  addBookImages as addBookImagesToBook,
+  deleteBookImage as deleteBookImageFromBook,
+  reorderBookImages as reorderBookImagesForBook,
+  type BookInput,
+  type BookStatus,
+  type BookFormat,
+} from '@/lib/data'
 import { yearOf } from '@/lib/dates'
 
-const MAX_COVER_SIZE = 5_000_000
+const MAX_UPLOAD_SIZE = 5_000_000
 
-async function saveCover(file: File): Promise<string> {
-  if (file.size > MAX_COVER_SIZE) {
-    throw new Error('Cover image is larger than 5 MB')
+async function saveUpload(file: File): Promise<string> {
+  if (file.size > MAX_UPLOAD_SIZE) {
+    throw new Error('Image is larger than 5 MB')
   }
 
   const safeName = file.name.replace(/[^a-zA-Z0-9._-]/g, '_')
@@ -41,7 +51,7 @@ async function parseForm(formData: FormData): Promise<BookInput> {
 
   const cover = formData.get('cover')
   const coverImage =
-    cover instanceof File && cover.size > 0 ? await saveCover(cover) : undefined
+    cover instanceof File && cover.size > 0 ? await saveUpload(cover) : undefined
 
   const yearRead = yearOf(finishedAt) ?? yearOf(startedAt)
 
@@ -91,4 +101,22 @@ export async function removeBook(id: number) {
   await deleteBook(id)
   revalidatePath('/')
   redirect('/')
+}
+
+export async function uploadBookImages(id: number, formData: FormData): Promise<string[]> {
+  const files = formData.getAll('images').filter((f): f is File => f instanceof File && f.size > 0)
+  const filenames = await Promise.all(files.map(saveUpload))
+  if (filenames.length) await addBookImagesToBook(id, filenames)
+  revalidatePath(`/books/${id}`)
+  return filenames
+}
+
+export async function removeBookImage(id: number, filename: string) {
+  await deleteBookImageFromBook(id, filename)
+  revalidatePath(`/books/${id}`)
+}
+
+export async function reorderBookImages(id: number, order: string[]) {
+  await reorderBookImagesForBook(id, order)
+  revalidatePath(`/books/${id}`)
 }
