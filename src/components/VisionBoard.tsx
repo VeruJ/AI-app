@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 
 type Props = {
   initialImages: string[]
@@ -19,6 +19,7 @@ export default function VisionBoard({
   const [openIndex, setOpenIndex] = useState<number | null>(null)
   const [dragIndex, setDragIndex] = useState<number | null>(null)
   const [uploading, setUploading] = useState(false)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
   useEffect(() => {
     if (openIndex === null) return
@@ -31,13 +32,20 @@ export default function VisionBoard({
     return () => window.removeEventListener('keydown', onKeyDown)
   }, [openIndex, images.length])
 
-  async function handleUpload(formData: FormData) {
+  async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files
+    if (!files || files.length === 0) return
+
+    const formData = new FormData()
+    for (const file of Array.from(files)) formData.append('images', file)
+
     setUploading(true)
     try {
       const added = await uploadAction(formData)
       if (added.length) setImages((prev) => [...prev, ...added])
     } finally {
       setUploading(false)
+      e.target.value = ''
     }
   }
 
@@ -58,21 +66,29 @@ export default function VisionBoard({
 
   return (
     <div>
-      <form action={handleUpload} className="mb-4 flex flex-wrap items-center gap-3">
-        <input type="file" name="images" accept="image/*" multiple className="text-sm" />
+      <div className="mb-4">
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          multiple
+          className="hidden"
+          onChange={handleFileChange}
+        />
         <button
-          type="submit"
+          type="button"
+          onClick={() => fileInputRef.current?.click()}
           disabled={uploading}
           className="rounded border border-gray-300 px-4 py-2 text-sm hover:bg-gray-50 disabled:opacity-50"
         >
           {uploading ? 'Uploading…' : 'Add images'}
         </button>
-      </form>
+      </div>
 
       {images.length === 0 ? (
         <p className="text-gray-500">No images yet — add a few to build your board.</p>
       ) : (
-        <div className="grid grid-cols-3 gap-2 sm:grid-cols-4">
+        <div className="flex flex-wrap gap-2">
           {images.map((file, index) => (
             <div
               key={file}
@@ -84,13 +100,13 @@ export default function VisionBoard({
               }}
               onDragOver={(e) => e.preventDefault()}
               onDrop={() => handleDrop(index)}
-              className="group relative aspect-square cursor-grab overflow-hidden rounded border border-gray-200"
+              className="group relative cursor-grab overflow-hidden rounded border border-gray-200"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={`/api/uploads/${file}`}
                 alt="Vision board"
-                className="h-full w-full object-cover"
+                className="block h-40 w-auto"
                 onClick={() => setOpenIndex(index)}
               />
               <button
