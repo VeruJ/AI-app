@@ -24,16 +24,26 @@ export default async function BookPage({
       </Link>
 
       <div className="mt-4 flex items-end justify-between gap-4">
-        {book.coverImage ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img
-            src={`/api/uploads/${book.coverImage}`}
-            alt={`Cover of ${book.title || 'book'}`}
-            className="h-24 w-auto rounded border border-gray-200"
-          />
-        ) : (
-          <span />
-        )}
+        <div className="flex items-end gap-4">
+          {book.coverImage && (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img
+              src={`/api/uploads/${book.coverImage}`}
+              alt={`Cover of ${book.title || 'book'}`}
+              className="h-24 w-auto rounded border border-gray-200"
+            />
+          )}
+          <div>
+            <h1 className="text-2xl font-bold">{book.title || 'Untitled'}</h1>
+            <p className="text-gray-500">
+              {book.author || 'Unknown author'}
+              {book.yearRead ? ` · ${book.yearRead}` : ''}
+            </p>
+            <div className="mt-2">
+              <StarRating rating={book.rating} />
+            </div>
+          </div>
+        </div>
         <div className="flex flex-col items-end gap-2">
           <span className="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-600">
             {STATUS_LABELS[book.status]}
@@ -41,17 +51,6 @@ export default async function BookPage({
           <span className="rounded-full bg-gray-100 px-3 py-1 text-sm text-gray-600">
             {FORMAT_LABELS[book.format]}
           </span>
-        </div>
-      </div>
-
-      <div className="mt-3">
-        <h1 className="text-2xl font-bold">{book.title || 'Untitled'}</h1>
-        <p className="text-gray-500">
-          {book.author || 'Unknown author'}
-          {book.yearRead ? ` · ${book.yearRead}` : ''}
-        </p>
-        <div className="mt-2">
-          <StarRating rating={book.rating} />
         </div>
       </div>
 
