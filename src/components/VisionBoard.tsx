@@ -68,7 +68,7 @@ export default function VisionBoard({
   return (
     <div>
       {images.length === 0 ? (
-        <p className="mb-4 text-gray-500">No images yet — add a few to build your board.</p>
+        <p className="mb-4 text-stone-500">No images yet — add a few to build your board.</p>
       ) : (
         <div className="mb-4 flex flex-wrap gap-2">
           {images.map((file, index) => (
@@ -82,7 +82,7 @@ export default function VisionBoard({
               }}
               onDragOver={(e) => e.preventDefault()}
               onDrop={() => handleDrop(index)}
-              className="relative cursor-grab overflow-hidden rounded border border-gray-200"
+              className="relative cursor-grab overflow-hidden rounded border border-stone-200"
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -109,7 +109,7 @@ export default function VisionBoard({
           type="button"
           onClick={() => fileInputRef.current?.click()}
           disabled={uploading}
-          className="rounded border border-gray-300 px-4 py-2 text-sm hover:bg-gray-50 disabled:opacity-50"
+          className="rounded border border-stone-300 px-4 py-2 text-sm hover:bg-stone-50 disabled:opacity-50"
         >
           {uploading ? 'Uploading…' : 'Add images'}
         </button>

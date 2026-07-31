@@ -16,7 +16,7 @@ export default async function EditBookPage({
 
   return (
     <main className="mx-auto max-w-2xl p-6">
-      <h1 className="mb-6 text-2xl font-bold">Edit book</h1>
+      <h1 className="font-heading mb-6 text-2xl font-bold">Edit book</h1>
       <BookForm
         action={editBook.bind(null, book.id)}
         submitLabel="Save changes"
